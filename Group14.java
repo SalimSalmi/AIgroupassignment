@@ -17,6 +17,8 @@ import negotiator.utility.AbstractUtilitySpace;
  */
 public class Group14 extends AbstractNegotiationParty {
 
+	private final double MINIMUM_UTILITY = 0.8;
+
 	private Bid lastReceivedBid = null;
 
 	@Override
@@ -48,23 +50,18 @@ public class Group14 extends AbstractNegotiationParty {
 	public Action chooseAction(List<Class<? extends Action>> validActions) {
 
 
-		// with 50% chance, counter offer
+		// If the utility of the proposed bid is lower than the minimum acceptable
+		// utility then counter offer.
 		// if we are the first party, also offer.
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
-				|| getUtility(lastReceivedBid) < 0.8) {
+				|| getUtility(lastReceivedBid) < MINIMUM_UTILITY) {
 
 			Bid bid;
 
 			do{
 				bid = generateRandomBid();
-//
-//				try {
-//					getUtilitySpace().getMaxUtilityBid();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
 
-			}while(getUtility(bid) < 0.8);
+			}while(getUtility(bid) < MINIMUM_UTILITY);
 
 			return new Offer(getPartyId(), bid);
 		} else {
@@ -93,7 +90,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	@Override
 	public String getDescription() {
-		return "Party group 14 v.0.0.5";
+		return "Party group 14 v.0.0.6";
 	}
 
 }
