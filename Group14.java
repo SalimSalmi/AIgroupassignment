@@ -1,10 +1,13 @@
 package ai2016;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import agents.anac.y2016.caduceus.agents.Caduceus.Opponent;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.Deadline;
+import negotiator.utility.*;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
@@ -20,6 +23,8 @@ public class Group14 extends AbstractNegotiationParty {
 	private final double MINIMUM_UTILITY = 0.8;
 
 	private Bid lastReceivedBid = null;
+
+	private ArrayList<OpponentModel> opponents = new ArrayList<OpponentModel>();
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
@@ -58,6 +63,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 			Bid bid;
 
+
 			do{
 				bid = generateRandomBid();
 
@@ -83,9 +89,34 @@ public class Group14 extends AbstractNegotiationParty {
 	@Override
 	public void receiveMessage(AgentID sender, Action action) {
 		super.receiveMessage(sender, action);
+
 		if (action instanceof Offer) {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
+
+		OpponentModel opponent;
+
+		if (getUtilitySpace() instanceof AdditiveUtilitySpace) {
+
+			opponent = new OpponentModelDiscrete(sender);
+		} else{
+			opponent = new OpponentModel(sender);
+		}
+
+		if(opponents.contains(opponent)) {
+			opponent = opponents.get(opponents.indexOf(opponent));
+		} else {
+			opponents.add(opponent);
+			opponent.init(getUtilitySpace());
+		}
+
+		if (action instanceof Offer) {
+			Bid bid = ((Offer) action).getBid();
+		}
+
+		System.out.print("opponents length:");
+		System.out.println(opponents.size());
+
 	}
 
 	@Override
