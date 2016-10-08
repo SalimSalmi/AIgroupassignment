@@ -121,7 +121,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	@Override
 	public String getDescription() {
-		return "Party group 14 v0.0.6";
+		return "Party group 14 v0.0.7";
 	}
 
 }
