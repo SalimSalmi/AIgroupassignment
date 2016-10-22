@@ -1,19 +1,19 @@
 package ai2016;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import agents.anac.y2016.caduceus.agents.Caduceus.Opponent;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.Deadline;
-import negotiator.utility.*;
+import negotiator.DeadlineType;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
+import negotiator.utility.AdditiveUtilitySpace;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is your negotiation party.
@@ -22,15 +22,20 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private final double MINIMUM_UTILITY = 0.8;
 
+	private ArrayList<OpponentModel> opponents = new ArrayList<>();
+
 	private Bid lastReceivedBid = null;
 
-	private ArrayList<OpponentModel> opponents = new ArrayList<OpponentModel>();
+	private AcceptanceStrategy acceptanceStrategy;
+	private BiddingStrategy biddingStrategy;
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
 			TimeLineInfo tl, long randomSeed, AgentID agentId) {
 
 		super.init(utilSpace, dl, tl, randomSeed, agentId);
+
+		DeadlineType type = dl.getType();
 
 		System.out.println("Discount Factor is "
 				+ utilSpace.getDiscountFactor());
@@ -39,6 +44,9 @@ public class Group14 extends AbstractNegotiationParty {
 
 		// if you need to initialize some variables, please initialize them
 		// below
+
+		acceptanceStrategy = new AcceptanceStrategy(utilSpace, MINIMUM_UTILITY, opponents);
+		biddingStrategy = new BiddingStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 
 	}
 
@@ -59,7 +67,7 @@ public class Group14 extends AbstractNegotiationParty {
 		// utility then counter offer.
 		// if we are the first party, also offer.
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
-				|| getUtility(lastReceivedBid) < MINIMUM_UTILITY) {
+				|| !acceptanceStrategy.accept(lastReceivedBid)) {
 
 			Bid bid;
 
@@ -112,16 +120,14 @@ public class Group14 extends AbstractNegotiationParty {
 
 		if (action instanceof Offer) {
 			Bid bid = ((Offer) action).getBid();
+			opponent.pushBid(bid);
 		}
-
-		System.out.print("opponents length:");
-		System.out.println(opponents.size());
 
 	}
 
 	@Override
 	public String getDescription() {
-		return "Party group 14 v0.0.7";
+		return "Party group 14 v0.0.9";
 	}
 
 }

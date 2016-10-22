@@ -1,8 +1,10 @@
 package ai2016;
 
 import negotiator.AgentID;
-import negotiator.utility.*;
-import negotiator.issue.*;
+import negotiator.Bid;
+import negotiator.issue.Issue;
+import negotiator.utility.AbstractUtilitySpace;
+
 import java.util.List;
 
 /**
@@ -10,17 +12,23 @@ import java.util.List;
  */
 public class OpponentModel {
 
-    AgentID agentID;
+    private AgentID agentID;
 
-    AbstractUtilitySpace utilSpace;
+    private AbstractUtilitySpace utilSpace;
 
     public OpponentModel(AgentID agentID){
         this.agentID = agentID;
     }
 
     public void init(AbstractUtilitySpace utilSpace){
+
         System.out.println("OpponentModel");
+
+        List<Issue> issues = utilSpace.getDomain().getIssues();
+
     }
+
+    public void pushBid(Bid bid) {}
 
     public AgentID getAgentID() {
         return agentID;
