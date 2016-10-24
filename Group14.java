@@ -29,6 +29,8 @@ public class Group14 extends AbstractNegotiationParty {
 	private AcceptanceStrategy acceptanceStrategy;
 	private BiddingStrategy biddingStrategy;
 
+	private int roundNo = 0;
+
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
 			TimeLineInfo tl, long randomSeed, AgentID agentId) {
@@ -77,6 +79,17 @@ public class Group14 extends AbstractNegotiationParty {
 
 			Bid bid;
 
+			roundNo = roundNo +1;
+
+			if(roundNo == 10){
+
+				OpponentModel oppAvg = opponents.getAverageOpponentModel();
+
+				System.out.println("The round now is :"+ roundNo);
+				System.out.print(" ");
+
+
+			}
 
 			do{
 				//bid = biddingStrategy.getNextBid();
@@ -90,6 +103,10 @@ public class Group14 extends AbstractNegotiationParty {
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
+
+
+
+
 	}
 
 	/**
@@ -116,6 +133,8 @@ public class Group14 extends AbstractNegotiationParty {
 			Bid bid = ((Offer) action).getBid();
 			opponent.pushBid(bid);
 		}
+
+
 	}
 
 	private void fillBidTree (Bid bid){

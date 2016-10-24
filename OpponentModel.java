@@ -44,4 +44,10 @@ public class OpponentModel {
 
         return false;
     }
+
+    public AbstractUtilitySpace getUtilSpace(){
+
+        return utilSpace;
+
+    }
 }

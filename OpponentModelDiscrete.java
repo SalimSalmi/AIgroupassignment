@@ -68,12 +68,20 @@ public class OpponentModelDiscrete extends OpponentModel{
 
             for (int n=1; n<=utilSpace.getNrOfEvaluators() ; n++) {
                 Evaluator evaluator = utilSpace.getEvaluator(n);
-                System.out.println("evaluator: "+evaluator);
-                System.out.println("weight="+ evaluator.getWeight());
-                System.out.println();
+                //System.out.println("evaluator: "+evaluator);
+                //System.out.println("weight="+ evaluator.getWeight());
+                //System.out.println();
             }
 
+            System.out.print("The bid has been added and the size now is "+bids.size());
+
         }
+    }
+
+    public AdditiveUtilitySpace getUtilSpace(){
+
+        return utilSpace;
+
     }
 
     private void updateModel(Bid bid){
@@ -95,6 +103,25 @@ public class OpponentModelDiscrete extends OpponentModel{
 
             it.remove(); // avoids a ConcurrentModificationException
         }
+
+    }
+
+    public double getDropRate(){
+
+        System.out.print("The size of bids is :"+bids.size());
+
+        double prev = utilSpace.getUtility(bids.get(0));
+
+        double average = 0;
+
+        for(int i = 1; i < bids.size(); i++) {
+            double curr = utilSpace.getUtility(bids.get(i));
+            average += curr - prev;
+            prev = curr;
+        }
+
+
+        return average / bids.size();
 
     }
 
