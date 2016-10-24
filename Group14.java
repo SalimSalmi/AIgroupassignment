@@ -83,7 +83,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 			if(roundNo == 10){
 
-				OpponentModel oppAvg = opponents.getAverageOpponentModel();
+				OpponentModel oppAvg = opponents.getAverageOpponentModel(getUtilitySpace());
 
 				System.out.println("The round now is :"+ roundNo);
 				System.out.print(" ");
@@ -127,13 +127,24 @@ public class Group14 extends AbstractNegotiationParty {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
 
-		OpponentModel opponent = opponents.getOpponent(sender, getUtilitySpace());
 
-		if (action instanceof Offer) {
-			Bid bid = ((Offer) action).getBid();
-			opponent.pushBid(bid);
+		System.out.println("Sender: " + sender);
+
+		System.out.println("Sender is null: " + (sender != null));
+
+		if(sender != null) {
+			OpponentModel opponent = opponents.getOpponent(sender, getUtilitySpace());
+
+			if (action instanceof Offer) {
+				Bid bid = ((Offer) action).getBid();
+				opponent.pushBid(bid);
+			}
+
+			if (action instanceof Accept) {
+				Bid bid = ((Accept) action).getBid();
+				opponent.pushBid(bid);
+			}
 		}
-
 
 	}
 

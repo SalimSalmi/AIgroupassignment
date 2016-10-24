@@ -57,8 +57,10 @@ public class OpponentModelDiscrete extends OpponentModel{
     @Override
     public void pushBid(Bid bid){
 
+
         // Add bid to bid history
         bids.add(bid);
+
 
         if(bids.size() < MAX_NUM_BIDS){
 
@@ -72,8 +74,6 @@ public class OpponentModelDiscrete extends OpponentModel{
                 //System.out.println("weight="+ evaluator.getWeight());
                 //System.out.println();
             }
-
-            System.out.print("The bid has been added and the size now is "+bids.size());
 
         }
     }
@@ -108,8 +108,6 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     public double getDropRate(){
 
-        System.out.print("The size of bids is :"+bids.size());
-
         double prev = utilSpace.getUtility(bids.get(0));
 
         double average = 0;
@@ -121,7 +119,7 @@ public class OpponentModelDiscrete extends OpponentModel{
         }
 
 
-        return average / bids.size();
+        return average / (bids.size()-1);
 
     }
 

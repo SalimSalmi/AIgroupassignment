@@ -22,7 +22,7 @@ public class BiddingStrategy {
     public Bid getNextBid() throws Exception {
 
 
-        OpponentModel oppAvg = opponents.getAverageOpponentModel();
+        OpponentModel oppAvg = opponents.getAverageOpponentModel(utilSpace);
 
 
         try {

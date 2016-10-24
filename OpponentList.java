@@ -38,6 +38,8 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         HashMap<OpponentModelDiscrete, Double> alphas = new HashMap<>();
 
+        System.out.println("size of opponentlist " + this.size());
+
         for(int j=0; j < this.size(); j++){
             OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
 
@@ -47,9 +49,10 @@ public class OpponentList extends ArrayList<OpponentModel> {
         return alphas;
     }
 
-    public OpponentModel getAverageOpponentModel() {
+    public OpponentModel getAverageOpponentModel(AbstractUtilitySpace utilSpace) {
 
         OpponentModelDiscrete opponentAvg = new OpponentModelDiscrete(null);
+        opponentAvg.init(utilSpace);
 
         HashMap<OpponentModelDiscrete, Double> alpha = getAlphas();
 
