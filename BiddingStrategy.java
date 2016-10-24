@@ -22,7 +22,10 @@ public class BiddingStrategy {
     }
 
     public Bid getNextBid(){
+
+
         return null;
+
     }
 
 }

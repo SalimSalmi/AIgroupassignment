@@ -24,6 +24,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private ArrayList<OpponentModel> opponents = new ArrayList<>();
 
+
 	private Bid lastReceivedBid = null;
 
 	private AcceptanceStrategy acceptanceStrategy;
@@ -73,6 +74,8 @@ public class Group14 extends AbstractNegotiationParty {
 
 
 			do{
+				//bid = biddingStrategy.getNextBid();
+
 				bid = generateRandomBid();
 
 			}while(getUtility(bid) < MINIMUM_UTILITY);
@@ -121,6 +124,7 @@ public class Group14 extends AbstractNegotiationParty {
 		if (action instanceof Offer) {
 			Bid bid = ((Offer) action).getBid();
 			opponent.pushBid(bid);
+
 		}
 
 	}
