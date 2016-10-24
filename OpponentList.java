@@ -38,7 +38,7 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         HashMap<OpponentModelDiscrete, Double> alphas = new HashMap<>();
 
-        System.out.println("size of opponentlist " + this.size());
+        //System.out.println("size of opponentlist " + this.size());
 
         for(int j=0; j < this.size(); j++){
             OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
@@ -56,42 +56,49 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         HashMap<OpponentModelDiscrete, Double> alpha = getAlphas();
 
+
+
         for(int i=1;i<= opponentAvg.getUtilSpace().getNrOfEvaluators();i++){
 
             EvaluatorDiscrete evaluator = (EvaluatorDiscrete) opponentAvg.getUtilSpace().getEvaluator(i);
 
-            double weightAvg = 0;
 
 
-            for(int j=0; j < this.size(); j++) {
+            for(ValueDiscrete value : evaluator.getValues()) {
 
-                OpponentModelDiscrete oppNew = (OpponentModelDiscrete) this.get(j);
+                double valueAvg = 0;
+                double weightAvg = 0;
 
-                EvaluatorDiscrete evaluatorIndex = (EvaluatorDiscrete) oppNew.getUtilSpace().getEvaluator(i);
-
-                System.out.println("The opponent weight is :" +evaluatorIndex.getWeight());
-                System.out.println("The calculated weightAvg is"+weightAvg);
-
-                weightAvg = weightAvg + alpha.get(oppNew) * evaluatorIndex.getWeight();
+                for(int j=0; j < this.size(); j++) {
 
 
+                    OpponentModelDiscrete oppNew = (OpponentModelDiscrete) this.get(j);
 
-                evaluator.setWeight(weightAvg);
+                    EvaluatorDiscrete evaluatorIndex = (EvaluatorDiscrete) oppNew.getUtilSpace().getEvaluator(i);
 
-                for(ValueDiscrete value : evaluator.getValues()) {
-
-                    double valueAvg = 0;
+                    //System.out.print("The weight for agent for some evaluator "+ i +"is"+ evaluatorIndex.getWeight());
 
                     valueAvg = valueAvg + alpha.get(oppNew) * evaluatorIndex.getValue(value);
 
-                    try {
-                        evaluator.setEvaluationDouble(value, valueAvg);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    weightAvg = weightAvg + alpha.get(oppNew) * evaluatorIndex.getWeight();
+
+
                 }
 
+                try {
+                    //System.out.print("The value average for evaluator "+ i +"is "+valueAvg);
+                    evaluator.setEvaluationDouble(value, valueAvg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                //System.out.print("The average weight for agent for some evaluator "+ i +"is"+weightAvg);
+
+                evaluator.setWeight(weightAvg);
+
+
             }
+
 
         }
 

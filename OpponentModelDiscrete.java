@@ -119,7 +119,9 @@ public class OpponentModelDiscrete extends OpponentModel{
         }
 
 
-        return average / (bids.size()-1);
+        //return average / (bids.size()-1);
+
+        return 1;
 
     }
 

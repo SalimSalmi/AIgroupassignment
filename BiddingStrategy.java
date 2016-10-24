@@ -24,14 +24,9 @@ public class BiddingStrategy {
 
         OpponentModel oppAvg = opponents.getAverageOpponentModel(utilSpace);
 
+        return oppAvg.getUtilSpace().getMaxUtilityBid();
 
-        try {
-            return oppAvg.getUtilSpace().getMaxUtilityBid();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return null;
     }
 
 }

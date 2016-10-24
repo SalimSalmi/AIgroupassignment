@@ -81,12 +81,15 @@ public class Group14 extends AbstractNegotiationParty {
 
 			roundNo = roundNo +1;
 
-			if(roundNo == 10){
+			if(roundNo == 200){
 
 				OpponentModel oppAvg = opponents.getAverageOpponentModel(getUtilitySpace());
 
-				System.out.println("The round now is :"+ roundNo);
-				System.out.print(" ");
+				try {
+					System.out.println("The max utility bid is :"+ oppAvg.getUtilSpace().getMaxUtilityBid());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 
 			}
@@ -94,7 +97,7 @@ public class Group14 extends AbstractNegotiationParty {
 			do{
 				//bid = biddingStrategy.getNextBid();
 
-				bid = generateRandomBid();
+			bid = generateRandomBid();
 
 			}while(getUtility(bid) < MINIMUM_UTILITY);
 
@@ -128,9 +131,9 @@ public class Group14 extends AbstractNegotiationParty {
 		}
 
 
-		System.out.println("Sender: " + sender);
+		//System.out.println("Sender: " + sender);
 
-		System.out.println("Sender is null: " + (sender != null));
+		//System.out.println("Sender is null: " + (sender != null));
 
 		if(sender != null) {
 			OpponentModel opponent = opponents.getOpponent(sender, getUtilitySpace());

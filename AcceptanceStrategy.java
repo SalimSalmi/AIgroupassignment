@@ -21,7 +21,7 @@ public class AcceptanceStrategy {
 
     public boolean accept(Bid bid){
 
-        System.out.println("The util is : "+utilSpace.getUtility(bid));
+        //System.out.println("The util is : "+utilSpace.getUtility(bid));
         return utilSpace.getUtility(bid) > MINIMUM_UTILITY;
 
 
