@@ -102,14 +102,24 @@ public class Group14 extends AbstractNegotiationParty {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
 
+		OpponentModel opponent = getOpponent(sender);
+
+
+		if (action instanceof Offer) {
+			Bid bid = ((Offer) action).getBid();
+			opponent.pushBid(bid);
+		}
+
+	}
+
+	private OpponentModel getOpponent(AgentID sender) {
+
 		OpponentModel opponent;
 
-		if (getUtilitySpace() instanceof AdditiveUtilitySpace) {
-
+		if (getUtilitySpace() instanceof AdditiveUtilitySpace)
 			opponent = new OpponentModelDiscrete(sender);
-		} else{
+		else
 			opponent = new OpponentModel(sender);
-		}
 
 		if(opponents.contains(opponent)) {
 			opponent = opponents.get(opponents.indexOf(opponent));
@@ -118,11 +128,7 @@ public class Group14 extends AbstractNegotiationParty {
 			opponent.init(getUtilitySpace());
 		}
 
-		if (action instanceof Offer) {
-			Bid bid = ((Offer) action).getBid();
-			opponent.pushBid(bid);
-		}
-
+		return opponent;
 	}
 
 	@Override
