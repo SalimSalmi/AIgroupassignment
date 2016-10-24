@@ -12,7 +12,6 @@ import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * This is your negotiation party.
@@ -22,8 +21,6 @@ public class Group14 extends AbstractNegotiationParty {
 	private final double MINIMUM_UTILITY = 0.8;
 
 	private Bid lastReceivedBid = null;
-
-	private TreeMap<Integer, Bid> bidTree = new TreeMap<>();
 
 	private OpponentList opponents = new OpponentList();
 	private AcceptanceStrategy acceptanceStrategy;
@@ -48,12 +45,6 @@ public class Group14 extends AbstractNegotiationParty {
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 		biddingStrategy = new BiddingStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 
-		try {
-			fillBidTree(getUtilitySpace().getMaxUtilityBid());
-		} catch (Exception e) {
-			System.out.println("Get max utility bid: There are no bids.");
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -118,13 +109,11 @@ public class Group14 extends AbstractNegotiationParty {
 		}
 	}
 
-	private void fillBidTree (Bid bid){
-
-	}
 
 	@Override
 	public String getDescription() {
 		return "Party group 14 v0.0.10";
 	}
+
 
 }
