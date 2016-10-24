@@ -59,12 +59,14 @@ public class OpponentModelDiscrete extends OpponentModel{
             bids.add(bid);
             updateModel(bid);
 
-            for (int n=1; n<=utilSpace.getNrOfEvaluators() ; n++          ) {
+
+            for (int n=1; n<=utilSpace.getNrOfEvaluators() ; n++) {
                 Evaluator evaluator = utilSpace.getEvaluator(n);
                 System.out.println("evaluator: "+evaluator);
                 System.out.println("weight="+ evaluator.getWeight());
                 System.out.println();
             }
+
         }
     }
 
@@ -89,5 +91,45 @@ public class OpponentModelDiscrete extends OpponentModel{
 
             it.remove(); // avoids a ConcurrentModificationException
         }
+
+
     }
+
+    private double getopputil(Bid bid){
+
+
+        double utilityValue = 0;
+
+        Iterator it = bid.getValues().entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+
+            EvaluatorDiscrete evaluator = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair.getKey());
+
+            double weight = evaluator.getWeight();
+
+            ValueDiscrete value = (ValueDiscrete) pair.getValue();
+
+
+            try {
+                utilityValue = utilityValue + weight*(evaluator.getEvaluation(value));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //System.out.println("The weight is"+weight);
+            //System.out.println("The issue value is"+evaluator.getValue(value));
+
+            //System.out.println("The utility value is"+utilityValue);
+
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+
+
+        return utilityValue;
+
+
+    }
+
 }

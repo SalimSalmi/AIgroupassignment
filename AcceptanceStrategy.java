@@ -25,5 +25,7 @@ public class AcceptanceStrategy {
 
         return utilSpace.getUtility(bid) > MINIMUM_UTILITY;
 
+
+
     }
 }
