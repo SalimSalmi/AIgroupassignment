@@ -33,6 +33,7 @@ public class OpponentModelDiscrete extends OpponentModel{
     public void init(AbstractUtilitySpace utilSpace) {
         this.utilSpace = (AdditiveUtilitySpace) utilSpace;
 
+        // Reset the weights and the values for the utility space.
         for (int n=1; n<=this.utilSpace.getNrOfEvaluators() ; n++) {
             Evaluator evaluator = this.utilSpace.getEvaluator(n);
             evaluator.setWeight(1.0/this.utilSpace.getNrOfEvaluators());
@@ -55,8 +56,13 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     @Override
     public void pushBid(Bid bid){
+
+        // Add bid to bid history
+        bids.add(bid);
+
         if(bids.size() < MAX_NUM_BIDS){
-            bids.add(bid);
+
+            // Update the utility space
             updateModel(bid);
 
 
@@ -71,8 +77,6 @@ public class OpponentModelDiscrete extends OpponentModel{
     }
 
     private void updateModel(Bid bid){
-
-
 
         Iterator it = bid.getValues().entrySet().iterator();
 
@@ -91,44 +95,6 @@ public class OpponentModelDiscrete extends OpponentModel{
 
             it.remove(); // avoids a ConcurrentModificationException
         }
-
-
-    }
-
-    private double getopputil(Bid bid){
-
-
-        double utilityValue = 0;
-
-        Iterator it = bid.getValues().entrySet().iterator();
-
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-
-            EvaluatorDiscrete evaluator = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair.getKey());
-
-            double weight = evaluator.getWeight();
-
-            ValueDiscrete value = (ValueDiscrete) pair.getValue();
-
-
-            try {
-                utilityValue = utilityValue + weight*(evaluator.getEvaluation(value));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //System.out.println("The weight is"+weight);
-            //System.out.println("The issue value is"+evaluator.getValue(value));
-
-            //System.out.println("The utility value is"+utilityValue);
-
-            it.remove(); // avoids a ConcurrentModificationException
-        }
-
-
-        return utilityValue;
-
 
     }
 

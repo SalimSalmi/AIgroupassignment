@@ -10,10 +10,9 @@ import negotiator.actions.Offer;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
-import negotiator.utility.AdditiveUtilitySpace;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * This is your negotiation party.
@@ -22,11 +21,11 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private final double MINIMUM_UTILITY = 0.8;
 
-	private ArrayList<OpponentModel> opponents = new ArrayList<>();
-
-
 	private Bid lastReceivedBid = null;
 
+	private TreeMap<Integer, Bid> bidTree = new TreeMap<>();
+
+	private OpponentList opponents = new OpponentList();
 	private AcceptanceStrategy acceptanceStrategy;
 	private BiddingStrategy biddingStrategy;
 
@@ -49,6 +48,12 @@ public class Group14 extends AbstractNegotiationParty {
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 		biddingStrategy = new BiddingStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 
+		try {
+			fillBidTree(getUtilitySpace().getMaxUtilityBid());
+		} catch (Exception e) {
+			System.out.println("Get max utility bid: There are no bids.");
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -105,39 +110,21 @@ public class Group14 extends AbstractNegotiationParty {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
 
-		OpponentModel opponent = getOpponent(sender);
-
+		OpponentModel opponent = opponents.getOpponent(sender, getUtilitySpace());
 
 		if (action instanceof Offer) {
 			Bid bid = ((Offer) action).getBid();
 			opponent.pushBid(bid);
 		}
-
 	}
 
-	private OpponentModel getOpponent(AgentID sender) {
-
-		OpponentModel opponent;
-
-		if (getUtilitySpace() instanceof AdditiveUtilitySpace)
-			opponent = new OpponentModelDiscrete(sender);
-		else
-			opponent = new OpponentModel(sender);
-
-		if(opponents.contains(opponent)) {
-			opponent = opponents.get(opponents.indexOf(opponent));
-		} else {
-			opponents.add(opponent);
-			opponent.init(getUtilitySpace());
-		}
-
-		return opponent;
+	private void fillBidTree (Bid bid){
 
 	}
 
 	@Override
 	public String getDescription() {
-		return "Party group 14 v0.0.9";
+		return "Party group 14 v0.0.10";
 	}
 
 }
