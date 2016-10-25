@@ -108,20 +108,41 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     public double getDropRate(){
 
-        double prev = utilSpace.getUtility(bids.get(0));
-
         double average = 0;
 
-        for(int i = 1; i < bids.size(); i++) {
-            double curr = utilSpace.getUtility(bids.get(i));
-            average += curr - prev;
-            prev = curr;
+        int interval = 10;///Set it later
+
+        int count = 0;
+
+        double avg_final = 0;
+
+        for(int i = 1; i < (bids.size()-interval); i++) {
+
+            double avg_temp = 0;
+
+            double prev = utilSpace.getUtility(bids.get(i-1));
+
+
+            for(int j=i; j< (i+interval);j++ ){
+
+                double curr = utilSpace.getUtility(bids.get(j));
+
+                avg_temp += (curr - prev)*(curr - prev);
+                prev = curr;
+
+            }
+
+            average = average + avg_temp;
+
+            count++;
         }
 
+        avg_final = (average / count);
+        //System.out.println("The decreasing rate is"+ avg_final);
 
-        //return average / (bids.size()-1);
+        return avg_final;
 
-        return 1;
+        //return 1;
 
     }
 
