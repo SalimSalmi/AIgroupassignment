@@ -20,7 +20,7 @@ public class OpponentModelDiscrete extends OpponentModel{
     private AdditiveUtilitySpace utilSpace;
 
     private ArrayList<Bid> bids = new ArrayList<>();
-    private int MAX_NUM_BIDS = 100;
+    private boolean modeling = true;
 
     private ArrayList<ArrayList<ValueDiscrete>> issues = new ArrayList<>();
 
@@ -50,7 +50,10 @@ public class OpponentModelDiscrete extends OpponentModel{
                 }
             }
         }
+    }
 
+    public void stopModeling(){
+        this.modeling = false;
     }
 
 
@@ -62,19 +65,10 @@ public class OpponentModelDiscrete extends OpponentModel{
         bids.add(bid);
 
 
-        if(bids.size() < MAX_NUM_BIDS){
+        if(modeling){
 
             // Update the utility space
             updateModel(bid);
-
-
-            for (int n=1; n<=utilSpace.getNrOfEvaluators() ; n++) {
-                Evaluator evaluator = utilSpace.getEvaluator(n);
-                //System.out.println("evaluator: "+evaluator);
-                //System.out.println("weight="+ evaluator.getWeight());
-                //System.out.println();
-            }
-
         }
     }
 

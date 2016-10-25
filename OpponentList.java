@@ -35,6 +35,13 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
     }
 
+    public void stopModeling(){
+        for(int j = 0; j < this.size(); j++) {
+            OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
+            opponent.stopModeling();
+        }
+    }
+
     private HashMap<OpponentModelDiscrete, Double> getAlphas(){
 
         HashMap<OpponentModelDiscrete, Double> alphas = new HashMap<>();

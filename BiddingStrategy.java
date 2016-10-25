@@ -22,25 +22,44 @@ public class BiddingStrategy {
 
     private HashMap<Integer, HashMap<Value, Double>> values = new HashMap<>();
     private HashMap<Integer, Double> weights = new HashMap<>();
-
+    private Bid currentBid;
+    private Bid targetBid;
+    private OpponentModel averageOpponent;
 
     public BiddingStrategy(AbstractUtilitySpace utilSpace, double minUtil, OpponentList opponents) {
         this.utilSpace = utilSpace;
         this.MINIMUM_UTILITY = minUtil;
         this.opponents = opponents;
 
-        setOrdering();
+        setEvalValues();
     }
 
-    public Bid getNextBid() throws Exception {
+    public Bid getNextBid() {
 
-        OpponentModel oppAvg = opponents.getAverageOpponentModel(utilSpace);
+        try {
+            if(currentBid == null) {
+                currentBid = utilSpace.getMaxUtilityBid();
+            }
+            if(targetBid == null) {
+                if(averageOpponent == null) {
+                    updateAverageOpponent();
+                }
+                targetBid = averageOpponent.getUtilSpace().getMaxUtilityBid();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        return oppAvg.getUtilSpace().getMaxUtilityBid();
+        currentBid = getReducedBid(targetBid, currentBid);
 
+        return currentBid;
     }
 
-    private void setOrdering() {
+    public void updateAverageOpponent(){
+        averageOpponent = opponents.getAverageOpponentModel(utilSpace);
+    }
+
+    private void setEvalValues() {
 
         if (utilSpace instanceof AdditiveUtilitySpace) {
             AdditiveUtilitySpace myspace = (AdditiveUtilitySpace) utilSpace;
@@ -69,7 +88,7 @@ public class BiddingStrategy {
         }
     }
 
-    public Bid getReducedBid(Bid target, Bid current) {
+    private Bid getReducedBid(Bid target, Bid current) {
 
         // If the bids are already the same utility return the target.
         if(utilSpace.getUtility(target) == utilSpace.getUtility(current)) {

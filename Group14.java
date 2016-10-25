@@ -3,7 +3,6 @@ package ai2016;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.Deadline;
-import negotiator.DeadlineType;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
@@ -18,27 +17,27 @@ import java.util.List;
  */
 public class Group14 extends AbstractNegotiationParty {
 
-	private final float MINIMUM_UTILITY = 0.8f;
-	private final float FINAL_MODEL_TIME = 0.2f; //Deadline to fix the opponent model
-	private final float MEAN_MODEL_TIME = 0.6f; //Deadline to start calculating the mean model
-	private final float CONCEDE_TIME = 0.9f; //Deadline to hard concede
-	private final int REFRESH_MEAN = 10; //Amount of times the mean model is being refreshed.
+	private final float MINIMUM_UTILITY = 0.9f;
+	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
+	private final float MEAN_MODEL_TIME = 0.6f; // Deadline to start calculating the mean model
+	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
+	private final int REFRESH_MEAN = 10; // Amount of times the mean model is being refreshed
+	private Double nextRefresh; // Next time the mean model needs to be calculated.
+
+	//The state of the negotiation we are in, will change depending on the time left.
+	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
 
 	private Bid lastReceivedBid = null;
 
-	private OpponentList opponents = new OpponentList();
-	private AcceptanceStrategy acceptanceStrategy;
-	private BiddingStrategy biddingStrategy;
-
-	private int roundNo = 0;
+	private OpponentList opponents = new OpponentList(); // List of opponent models
+	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
+	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
 			TimeLineInfo tl, long randomSeed, AgentID agentId) {
 
 		super.init(utilSpace, dl, tl, randomSeed, agentId);
-
-		DeadlineType type = dl.getType();
 
 		System.out.println("Discount Factor is "
 				+ utilSpace.getDiscountFactor());
@@ -65,38 +64,31 @@ public class Group14 extends AbstractNegotiationParty {
 	@Override
 	public Action chooseAction(List<Class<? extends Action>> validActions) {
 
+		setState();
 
-		// If the utility of the proposed bid is lower than the minimum acceptable
-		// utility then counter offer.
-		// if we are the first party, also offer.
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid)) {
 
 			Bid bid;
 
-			roundNo = roundNo +1;
-
-			if(roundNo == 2000){
-
-				OpponentModel oppAvg = opponents.getAverageOpponentModel(getUtilitySpace());
-
-				try {
-					System.out.println("The max utility bid is :"+ oppAvg.getUtilSpace().getMaxUtilityBid());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-
+			switch(STATE) {
+				case MEAN_MODELING:
+					opponents.stopModeling();
+				case OPPONENT_MODELING:
+					bid = getHardHeadedBid();
+					break;
+				case CONCEDING:
+					bid = biddingStrategy.getNextBid();
+					break;
+				case DEADLINE:
+					bid = biddingStrategy.getNextBid();
+					break;
+				default:
+					bid = getHardHeadedBid();
 			}
 
-			do{
-				//bid = biddingStrategy.getNextBid();
-
-			bid = generateRandomBid();
-
-			}while(getUtility(bid) < MINIMUM_UTILITY);
-
 			return new Offer(getPartyId(), bid);
+
 		} else {
 
 			return new Accept(getPartyId(), lastReceivedBid);
@@ -144,4 +136,36 @@ public class Group14 extends AbstractNegotiationParty {
 		return "Party group 14 v0.0.10";
 	}
 
+
+	private void setState(){
+
+		double time = getTimeLine().getCurrentTime() / getTimeLine().getTotalTime();
+		double refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
+
+		if(nextRefresh == null) {
+			nextRefresh = MEAN_MODEL_TIME + refreshDelta;
+		} else if(nextRefresh < time) {
+			biddingStrategy.updateAverageOpponent();
+			nextRefresh += refreshDelta;
+		}
+
+		if(time > CONCEDE_TIME) {
+			STATE = NegotiationState.DEADLINE;
+		} else if (time > MEAN_MODEL_TIME) {
+			STATE = NegotiationState.CONCEDING;
+		} else if (time > OPPONENT_MODEL_TIME) {
+			STATE = NegotiationState.MEAN_MODELING;
+		}
+
+	}
+
+	private Bid getHardHeadedBid(){
+		Bid bid;
+		do{
+			bid = generateRandomBid();
+
+		}while(getUtility(bid) < MINIMUM_UTILITY);
+
+		return bid;
+	}
 }
