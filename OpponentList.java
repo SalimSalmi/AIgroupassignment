@@ -94,6 +94,8 @@ public class OpponentList extends ArrayList<OpponentModel> {
                 double valueAvg = 0;
                 double weightAvg = 0;
 
+                int k =1;
+
                 for(Map.Entry<OpponentModelDiscrete, Double> entry : alpha.entrySet()){
 
 
@@ -101,23 +103,26 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
                     EvaluatorDiscrete evaluatorIndex = (EvaluatorDiscrete) oppNew.getUtilSpace().getEvaluator(i);
 
-                    System.out.print("The weight for agent for some evaluator "+ i +"is"+ evaluatorIndex.getWeight());
+                    System.out.println("The weight for opponent " + k  + " some evaluator "+ i +"is"+ evaluatorIndex.getWeight());
 
-                    valueAvg = valueAvg + alpha.get(oppNew)*evaluatorIndex.getValue(value);
+                    valueAvg = valueAvg + alpha.get(oppNew) * evaluatorIndex.getValue(value);
 
-                    weightAvg = weightAvg + alpha.get(oppNew)*evaluatorIndex.getWeight();//Put the alpha value here
+                    System.out.println("The rate for opponent" + k + "is" + alpha.get(oppNew));
 
+                    weightAvg = weightAvg + alpha.get(oppNew) * evaluatorIndex.getWeight();//Put the alpha value here
+
+                    k=k+1;
 
                 }
 
                 try {
-                    System.out.print("The value average for evaluator "+ i +"is "+valueAvg);
+                    //System.out.print("The value average for evaluator "+ i +"is "+valueAvg);
                     evaluator.setEvaluationDouble(value, valueAvg);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                System.out.print("The average weight for agent for some evaluator "+ i +"is"+weightAvg);
+                System.out.println("The average weight for agent for some evaluator "+ i +"is"+weightAvg);
 
                 evaluator.setWeight(weightAvg);
 
@@ -126,7 +131,6 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
 
         }
-
 
         return opponentAvg;
     }

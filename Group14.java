@@ -81,7 +81,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 			roundNo = roundNo +1;
 
-			if(roundNo == 200){
+			if(roundNo == 2000){
 
 				OpponentModel oppAvg = opponents.getAverageOpponentModel(getUtilitySpace());
 
