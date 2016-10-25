@@ -12,18 +12,19 @@ import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * This is your negotiation party.
  */
 public class Group14 extends AbstractNegotiationParty {
 
-	private final double MINIMUM_UTILITY = 0.8;
+	private final float MINIMUM_UTILITY = 0.8f;
+	private final float FINAL_MODEL_TIME = 0.2f; //Deadline to fix the opponent model
+	private final float MEAN_MODEL_TIME = 0.6f; //Deadline to start calculating the mean model
+	private final float CONCEDE_TIME = 0.9f; //Deadline to hard concede
+	private final int REFRESH_MEAN = 10; //Amount of times the mean model is being refreshed.
 
 	private Bid lastReceivedBid = null;
-
-	private TreeMap<Integer, Bid> bidTree = new TreeMap<>();
 
 	private OpponentList opponents = new OpponentList();
 	private AcceptanceStrategy acceptanceStrategy;
@@ -50,12 +51,6 @@ public class Group14 extends AbstractNegotiationParty {
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 		biddingStrategy = new BiddingStrategy(utilSpace, MINIMUM_UTILITY, opponents);
 
-		try {
-			fillBidTree(getUtilitySpace().getMaxUtilityBid());
-		} catch (Exception e) {
-			System.out.println("Get max utility bid: There are no bids.");
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -107,9 +102,6 @@ public class Group14 extends AbstractNegotiationParty {
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
 
-
-
-
 	}
 
 	/**
@@ -130,11 +122,6 @@ public class Group14 extends AbstractNegotiationParty {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
 
-
-		//System.out.println("Sender: " + sender);
-
-		//System.out.println("Sender is null: " + (sender != null));
-
 		if(sender != null) {
 			OpponentModel opponent = opponents.getOpponent(sender, getUtilitySpace());
 
@@ -151,9 +138,6 @@ public class Group14 extends AbstractNegotiationParty {
 
 	}
 
-	private void fillBidTree (Bid bid){
-
-	}
 
 	@Override
 	public String getDescription() {
