@@ -1,7 +1,8 @@
 package ai2016;
 
 import negotiator.Bid;
-import negotiator.issue.*;
+import negotiator.issue.Value;
+import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.Evaluator;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class BiddingStrategy {
 
     private AbstractUtilitySpace utilSpace;
-    private double MINIMUM_UTILITY;
+    private MinimumUtility minimumUtility;
     private OpponentList opponents;
 
     private HashMap<Integer, HashMap<Value, Double>> values = new HashMap<>();
@@ -26,9 +27,9 @@ public class BiddingStrategy {
     private Bid targetBid;
     private OpponentModel averageOpponent;
 
-    public BiddingStrategy(AbstractUtilitySpace utilSpace, double minUtil, OpponentList opponents) {
+    public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
         this.utilSpace = utilSpace;
-        this.MINIMUM_UTILITY = minUtil;
+        this.minimumUtility = minimumUtility;
         this.opponents = opponents;
 
         setEvalValues();
@@ -50,7 +51,11 @@ public class BiddingStrategy {
             e.printStackTrace();
         }
 
-        currentBid = getReducedBid(targetBid, currentBid);
+        Bid nextBid = getReducedBid(targetBid, currentBid);
+
+        if(utilSpace.getUtility(nextBid) > minimumUtility.get()) {
+            currentBid = nextBid;
+        }
 
         return currentBid;
     }
