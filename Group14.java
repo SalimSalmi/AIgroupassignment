@@ -10,6 +10,7 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +37,8 @@ public class Group14 extends AbstractNegotiationParty {
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
 	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
 	private MinimumUtility minimumUtility;
+
+	private ArrayList<Double> bidUtils = new ArrayList<>();
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
@@ -78,6 +81,7 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
+			bidUtils.add(getUtility(bid));
 			return new Offer(getPartyId(), bid);
 
 		} else {
