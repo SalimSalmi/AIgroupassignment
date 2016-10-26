@@ -65,10 +65,12 @@ public class OpponentModelDiscrete extends OpponentModel{
         bids.add(bid);
 
 
+
         if(modeling){
 
             // Update the utility space
             updateModel(bid);
+
         }
     }
 
@@ -83,11 +85,14 @@ public class OpponentModelDiscrete extends OpponentModel{
         Iterator it = bid.getValues().entrySet().iterator();
 
         while (it.hasNext()) {
+
             Map.Entry pair = (Map.Entry)it.next();
 
             EvaluatorDiscrete evaluator = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair.getKey());
 
+
             ValueDiscrete value = (ValueDiscrete) pair.getValue();
+
 
             try {
                 evaluator.setEvaluationDouble(value, evaluator.getEvaluationNotNormalized(value) + 1);
@@ -96,6 +101,60 @@ public class OpponentModelDiscrete extends OpponentModel{
             }
 
             it.remove(); // avoids a ConcurrentModificationException
+        }
+
+        if(bids.size() > 1) {
+
+            Bid b_p = bids.get(bids.size() - 2);
+
+            Iterator it1 = bid.getValues().entrySet().iterator();
+
+            double w_s = 0;
+
+            while (it1.hasNext()) {
+
+                Map.Entry pair = (Map.Entry) it1.next();
+
+                EvaluatorDiscrete evaluator1 = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair.getKey());
+
+                ValueDiscrete value_c = (ValueDiscrete) pair.getValue();
+
+                ValueDiscrete value_p = (ValueDiscrete) b_p.getValue((int) pair.getKey());
+
+
+                if(value_c == value_p){
+
+                    double n_w = evaluator1.getWeight() + 0.1;
+
+
+
+                    evaluator1.setWeight( n_w );
+
+
+
+                }
+
+                w_s = w_s + evaluator1.getWeight();
+
+
+            }
+
+            it1 = bid.getValues().entrySet().iterator();
+
+            while (it1.hasNext()){
+
+                Map.Entry pair1 = (Map.Entry) it1.next();
+
+                EvaluatorDiscrete evaluator1 = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair1.getKey());
+
+
+                double o_w = evaluator1.getWeight();
+
+                evaluator1.setWeight(o_w/w_s);
+
+
+            }
+
         }
 
     }

@@ -57,6 +57,11 @@ public class BiddingStrategy {
 
     public void updateAverageOpponent(){
         averageOpponent = opponents.getAverageOpponentModel(utilSpace);
+        try {
+            targetBid = averageOpponent.getUtilSpace().getMaxUtilityBid();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setEvalValues() {
