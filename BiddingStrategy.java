@@ -71,8 +71,8 @@ public class BiddingStrategy {
         if(time / hardHeadedDeadline <=1) {
             int power = 2;
             double adjustedTime = (Math.pow(Math.E, power * time) - 1)/(Math.pow(Math.E, power) - 1);
-            return topBids.get((int) Math.floor(adjustedTime * topBids.size()));
-            //return topBids.get((int) Math.floor(time / hardHeadedDeadline * topBids.size()));
+            //return topBids.get((int) Math.floor(adjustedTime * topBids.size()));
+            return topBids.get((int) Math.floor(time / hardHeadedDeadline * topBids.size()));
             //return topBids.get((int) Math.floor(Math.pow(2, -Math.ceil(time / hardHeadedDeadline * topBids.size()))*topBids.size()));
         } else {
             return topBids.get(0);
@@ -98,7 +98,9 @@ public class BiddingStrategy {
 
         Bid nextBid = getReducedBid(targetBid, currentBid);
 
+
         if(utilSpace.getUtility(nextBid) > minimumUtility.get()) {
+            System.out.println("Lowering, minimum util: " + minimumUtility.get() + ", next bid: " + utilSpace.getUtility(nextBid));
             currentBid = nextBid;
         }
 

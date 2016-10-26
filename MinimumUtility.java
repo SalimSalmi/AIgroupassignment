@@ -5,9 +5,9 @@ package ai2016;
  */
 public class MinimumUtility {
 
-    private float minimum_start = 0.9f;
-    private float minimum_end = 0.5f;
-    private float curve = 10;
+    private float minimum_start;
+    private float minimum_end;
+    private float curve;
 
     private double utility;
 

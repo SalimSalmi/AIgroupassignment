@@ -26,7 +26,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private final float MINIMUM_UTILITY_START = 0.9f;
 	private final float MINIMUM_UTILITY_END = 0.5f;
-	private final float CONCESSION_CURVE = 10;
+	private final float CONCESSION_CURVE = 20;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
@@ -85,7 +85,6 @@ public class Group14 extends AbstractNegotiationParty {
 			return new Offer(getPartyId(), bid);
 
 		} else {
-
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
 
