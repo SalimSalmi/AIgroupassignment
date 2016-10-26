@@ -17,12 +17,15 @@ import java.util.List;
  */
 public class Group14 extends AbstractNegotiationParty {
 
-	private final float MINIMUM_UTILITY = 0.9f;
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
 	private final float MEAN_MODEL_TIME = 0.6f; // Deadline to start calculating the mean model
 	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
 	private final int REFRESH_MEAN = 10; // Amount of times the mean model is being refreshed
 	private Double nextRefresh; // Next time the mean model needs to be calculated.
+
+	private final float MINIMUM_UTILITY_START = 0.9f;
+	private final float MINIMUM_UTILITY_END = 0.5f;
+	private final float CONCESSION_CURVE = 10;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
@@ -32,6 +35,7 @@ public class Group14 extends AbstractNegotiationParty {
 	private OpponentList opponents = new OpponentList(); // List of opponent models
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
 	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
+	private MinimumUtility minimumUtility;
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
@@ -47,8 +51,9 @@ public class Group14 extends AbstractNegotiationParty {
 		// if you need to initialize some variables, please initialize them
 		// below
 
-		acceptanceStrategy = new AcceptanceStrategy(utilSpace, MINIMUM_UTILITY, opponents);
-		biddingStrategy = new BiddingStrategy(utilSpace, MINIMUM_UTILITY, opponents);
+		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
+		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
+		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents);
 
 	}
 
@@ -64,7 +69,7 @@ public class Group14 extends AbstractNegotiationParty {
 	@Override
 	public Action chooseAction(List<Class<? extends Action>> validActions) {
 
-		setState();
+		updateTimeAndState();
 
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid)) {
@@ -137,10 +142,12 @@ public class Group14 extends AbstractNegotiationParty {
 	}
 
 
-	private void setState(){
+	private void updateTimeAndState(){
 
 		double time = getTimeLine().getCurrentTime() / getTimeLine().getTotalTime();
 		double refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
+
+		minimumUtility.set(time);
 
 		if(nextRefresh == null) {
 			nextRefresh = MEAN_MODEL_TIME + refreshDelta;
@@ -164,7 +171,7 @@ public class Group14 extends AbstractNegotiationParty {
 		do{
 			bid = generateRandomBid();
 
-		}while(getUtility(bid) < MINIMUM_UTILITY);
+		}while(getUtility(bid) < minimumUtility.get());
 
 		return bid;
 	}

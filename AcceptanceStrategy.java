@@ -9,21 +9,23 @@ import negotiator.utility.AbstractUtilitySpace;
 public class AcceptanceStrategy {
 
     private AbstractUtilitySpace utilSpace;
-    private double MINIMUM_UTILITY;
+    private MinimumUtility minimumUtility;
     private OpponentList opponents;
 
 
-    public AcceptanceStrategy(AbstractUtilitySpace utilSpace, double minUtil, OpponentList opponents) {
+    public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
         this.utilSpace = utilSpace;
-        this.MINIMUM_UTILITY = minUtil;
+        this.minimumUtility = minimumUtility;
         this.opponents = opponents;
     }
 
     public boolean accept(Bid bid){
 
-        //System.out.println("The util is : "+utilSpace.getUtility(bid));
-        return utilSpace.getUtility(bid) > MINIMUM_UTILITY;
+        if ( utilSpace.getUtility(bid) > minimumUtility.get() ){
+            System.out.println("The util is : " + utilSpace.getUtility(bid) + ", the min util is : " + minimumUtility.get());
+        }
 
+        return utilSpace.getUtility(bid) > minimumUtility.get();
 
 
     }
