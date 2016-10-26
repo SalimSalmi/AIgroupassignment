@@ -73,26 +73,10 @@ public class Group14 extends AbstractNegotiationParty {
 
 		updateTimeAndState(time);
 
+		Bid bid = biddingStrategy.getNextBid(STATE, time);
+
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
-				|| !acceptanceStrategy.accept(lastReceivedBid)) {
-
-			Bid bid;
-
-			switch(STATE) {
-				case MEAN_MODELING:
-					opponents.stopModeling();
-				case OPPONENT_MODELING:
-					bid = biddingStrategy.getNextHardHeaded(time);
-					break;
-				case CONCEDING:
-					bid = biddingStrategy.getNextBid();
-					break;
-				case DEADLINE:
-					bid = biddingStrategy.getNextBid();
-					break;
-				default:
-					bid = biddingStrategy.getNextHardHeaded(time);
-			}
+				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
 			return new Offer(getPartyId(), bid);
 

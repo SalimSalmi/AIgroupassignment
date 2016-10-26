@@ -46,9 +46,33 @@ public class BiddingStrategy {
         }
     }
 
-    public Bid getNextHardHeaded(double time) {
+    public Bid getNextBid(NegotiationState STATE, double time){
+        Bid bid;
+        switch(STATE) {
+            case MEAN_MODELING:
+                opponents.stopModeling();
+            case OPPONENT_MODELING:
+                bid = getNextHardHeaded(time);
+                break;
+            case CONCEDING:
+                bid = getNextConcessionBid();
+                break;
+            case DEADLINE:
+                bid = getNextConcessionBid();
+                break;
+            default:
+                bid = getNextHardHeaded(time);
+        }
+
+        return bid;
+    }
+
+    private Bid getNextHardHeaded(double time) {
         if(time / hardHeadedDeadline <=1) {
-            return topBids.get((int) Math.floor(time / hardHeadedDeadline * topBids.size()));
+            int power = 2;
+            double adjustedTime = (Math.pow(Math.E, power * time) - 1)/(Math.pow(Math.E, power) - 1);
+            return topBids.get((int) Math.floor(adjustedTime * topBids.size()));
+            //return topBids.get((int) Math.floor(time / hardHeadedDeadline * topBids.size()));
             //return topBids.get((int) Math.floor(Math.pow(2, -Math.ceil(time / hardHeadedDeadline * topBids.size()))*topBids.size()));
         } else {
             return topBids.get(0);
@@ -56,7 +80,7 @@ public class BiddingStrategy {
 
     }
 
-    public Bid getNextBid() {
+    private Bid getNextConcessionBid() {
 
         try {
             if(currentBid == null) {
@@ -91,9 +115,7 @@ public class BiddingStrategy {
     }
 
     private void recursiveTopBids(Bid bid, TreeMap<Double, Bid> treeMap) {
-        if (utilSpace.getUtility(bid) < minimumUtility.get() || treeMap.containsValue(bid)) {
-            return;
-        }
+
         treeMap.put(utilSpace.getUtility(bid), bid);
 
         for (Map.Entry<Integer, Value> issue : bid.getValues().entrySet()) {
@@ -114,7 +136,13 @@ public class BiddingStrategy {
 
             }
 
-            recursiveTopBids(newBid, treeMap);
+            if (utilSpace.getUtility(newBid) < minimumUtility.get(hardHeadedDeadline) ) {
+                System.out.println("Stop at utility: " + utilSpace.getUtility(bid));
+            } else if(treeMap.containsValue(newBid)) {
+                System.out.println("Already contains this bid");
+            } else {
+                recursiveTopBids(newBid, treeMap);
+            }
         }
     }
 
