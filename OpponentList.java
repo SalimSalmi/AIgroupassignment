@@ -86,7 +86,7 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         OpponentModelDiscrete opponentAvg = new OpponentModelDiscrete(null);
 
-        opponentAvg.init(utilSpace);
+        opponentAvg.init((AbstractUtilitySpace) utilSpace.copy());
 
         HashMap<OpponentModelDiscrete, Double> alpha = getAlphas();
 

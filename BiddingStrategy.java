@@ -8,9 +8,7 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by archah on 19/10/2016.
@@ -20,19 +18,42 @@ public class BiddingStrategy {
     private AbstractUtilitySpace utilSpace;
     private MinimumUtility minimumUtility;
     private OpponentList opponents;
+    private float hardHeadedDeadline;
 
     private HashMap<Integer, HashMap<Value, Double>> values = new HashMap<>();
     private HashMap<Integer, Double> weights = new HashMap<>();
     private Bid currentBid;
     private Bid targetBid;
     private OpponentModel averageOpponent;
+    private ArrayList<Bid> topBids;
 
-    public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
+    public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents, float hardHeadedDeadline) {
         this.utilSpace = utilSpace;
         this.minimumUtility = minimumUtility;
         this.opponents = opponents;
+        this.hardHeadedDeadline = hardHeadedDeadline;
 
         setEvalValues();
+
+
+        try {
+            TreeMap<Double, Bid> treeMap = new TreeMap<>();
+            recursiveTopBids(utilSpace.getMaxUtilityBid(), treeMap);
+            topBids = new ArrayList<>(treeMap.values());
+            Collections.reverse(topBids);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Bid getNextHardHeaded(double time) {
+        if(time / hardHeadedDeadline <=1) {
+            return topBids.get((int) Math.floor(time / hardHeadedDeadline * topBids.size()));
+            //return topBids.get((int) Math.floor(Math.pow(2, -Math.ceil(time / hardHeadedDeadline * topBids.size()))*topBids.size()));
+        } else {
+            return topBids.get(0);
+        }
+
     }
 
     public Bid getNextBid() {
@@ -66,6 +87,34 @@ public class BiddingStrategy {
             targetBid = averageOpponent.getUtilSpace().getMaxUtilityBid();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void recursiveTopBids(Bid bid, TreeMap<Double, Bid> treeMap) {
+        if (utilSpace.getUtility(bid) < minimumUtility.get() || treeMap.containsValue(bid)) {
+            return;
+        }
+        treeMap.put(utilSpace.getUtility(bid), bid);
+
+        for (Map.Entry<Integer, Value> issue : bid.getValues().entrySet()) {
+
+            double currentIssue = values.get(issue.getKey()).get(issue.getValue());
+            double maxValue = 0;
+
+            Bid newBid = new Bid(bid);
+
+            for (Map.Entry<Value, Double> value : values.get(issue.getKey()).entrySet()) {
+
+                double current = value.getValue();
+
+                if(current < currentIssue && current >= maxValue) {
+                    maxValue = current;
+                    newBid = newBid.putValue(issue.getKey(), value.getKey());
+                }
+
+            }
+
+            recursiveTopBids(newBid, treeMap);
         }
     }
 

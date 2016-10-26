@@ -53,7 +53,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
-		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents);
+		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents, MEAN_MODEL_TIME);
 
 	}
 
@@ -69,7 +69,9 @@ public class Group14 extends AbstractNegotiationParty {
 	@Override
 	public Action chooseAction(List<Class<? extends Action>> validActions) {
 
-		updateTimeAndState();
+		double time = getTimeLine().getCurrentTime() / getTimeLine().getTotalTime();
+
+		updateTimeAndState(time);
 
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid)) {
@@ -80,7 +82,7 @@ public class Group14 extends AbstractNegotiationParty {
 				case MEAN_MODELING:
 					opponents.stopModeling();
 				case OPPONENT_MODELING:
-					bid = getHardHeadedBid();
+					bid = biddingStrategy.getNextHardHeaded(time);
 					break;
 				case CONCEDING:
 					bid = biddingStrategy.getNextBid();
@@ -89,7 +91,7 @@ public class Group14 extends AbstractNegotiationParty {
 					bid = biddingStrategy.getNextBid();
 					break;
 				default:
-					bid = getHardHeadedBid();
+					bid = biddingStrategy.getNextHardHeaded(time);
 			}
 
 			return new Offer(getPartyId(), bid);
@@ -142,9 +144,8 @@ public class Group14 extends AbstractNegotiationParty {
 	}
 
 
-	private void updateTimeAndState(){
+	private void updateTimeAndState(double time){
 
-		double time = getTimeLine().getCurrentTime() / getTimeLine().getTotalTime();
 		double refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
 
 		minimumUtility.set(time);
@@ -164,15 +165,5 @@ public class Group14 extends AbstractNegotiationParty {
 			STATE = NegotiationState.MEAN_MODELING;
 		}
 
-	}
-
-	private Bid getHardHeadedBid(){
-		Bid bid;
-		do{
-			bid = generateRandomBid();
-
-		}while(getUtility(bid) < minimumUtility.get());
-
-		return bid;
 	}
 }
