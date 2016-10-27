@@ -8,10 +8,7 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by archah on 08/10/2016.
@@ -19,16 +16,15 @@ import java.util.Map;
 public class OpponentModelDiscrete extends OpponentModel{
 
     private AdditiveUtilitySpace utilSpace;
+    private int BLOCK_SIZE;
 
     private ArrayList<Bid> bids = new ArrayList<>();
-    private HashMap<Bid,Double> ownUtils = new HashMap<>();
+    private ArrayList<Double> ownUtils = new ArrayList<>();
     private boolean modeling = true;
 
-    private ArrayList<ArrayList<ValueDiscrete>> issues = new ArrayList<>();
-
-
-    public OpponentModelDiscrete(AgentID agentID){
+    public OpponentModelDiscrete(AgentID agentID, int BLOCK_SIZE){
         super(agentID);
+        this.BLOCK_SIZE = BLOCK_SIZE;
     }
 
     @Override
@@ -65,8 +61,7 @@ public class OpponentModelDiscrete extends OpponentModel{
 
         // Add bid to bid history
         bids.add(bid);
-        ownUtils.put(bid,ownUtil);
-
+        ownUtils.add(ownUtil);
 
 
         if(modeling){
@@ -83,19 +78,17 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     }
 
-    public double getExpectedMax(){
+    public double getConcessionRate(){
 
         double mean = getMean();
-        double dev = getDeviation(mean);
+        double dev = getDeviation();
 
-        return mean + (1- mean)* dev;
+        return 1 - (mean/dev);
     }
 
     private double getMean(){
         double result = 0;
-        for(Double util : ownUtils.values()){
-
-            
+        for(Double util : ownUtils){
 
             result += util;
 
@@ -103,13 +96,16 @@ public class OpponentModelDiscrete extends OpponentModel{
         result = result / ownUtils.size();
         return result;
     }
-    private double getDeviation(double mean){
+    private double getDeviation(){
         double result = 0;
-        for(Double util : ownUtils.values()){
-            result += Math.pow(util,2) - Math.pow(mean,2);
+        List<Double> block = new ArrayList();
+        block.addAll(ownUtils);
+        block = block.subList(block.size() - BLOCK_SIZE, block.size());
 
+        for(Double util : block){
+            result += util;
         }
-        result = result / ownUtils.size();
+        result = result / block.size();
 
         return result;
     }
@@ -124,9 +120,7 @@ public class OpponentModelDiscrete extends OpponentModel{
 
             EvaluatorDiscrete evaluator = (EvaluatorDiscrete) utilSpace.getEvaluator((int) pair.getKey());
 
-
             ValueDiscrete value = (ValueDiscrete) pair.getValue();
-
 
             try {
                 evaluator.setEvaluationDouble(value, evaluator.getEvaluationNotNormalized(value) + 1);

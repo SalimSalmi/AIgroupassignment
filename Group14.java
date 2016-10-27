@@ -24,19 +24,21 @@ public class Group14 extends AbstractNegotiationParty {
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
 	private final float MEAN_MODEL_TIME = 0.35f; // Deadline to start calculating the mean model
 	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
-	private final int REFRESH_MEAN = 10; // Amount of times the mean model is being refreshed
+	private final int REFRESH_MEAN = 20; // Amount of times the mean model is being refreshed
 	private Double nextRefresh; // Next time the mean model needs to be calculated.
 
+	private final int BLOCK_SIZE = 5; // Size of bids to consider when calculating the concession.
+
 	private final float MINIMUM_UTILITY_START = 0.95f;
-	private final float MINIMUM_UTILITY_END = 0.6f;
-	private final float CONCESSION_CURVE = 120;
+	private final float MINIMUM_UTILITY_END = 0.0f;
+	private final float CONCESSION_CURVE = 20;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
 
 	private Bid lastReceivedBid = null;
 
-	private OpponentList opponents = new OpponentList(); // List of opponent models
+	private OpponentList opponents = new OpponentList(BLOCK_SIZE); // List of opponent models
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
 	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
 	private MinimumUtility minimumUtility; // The function for deciding the minimum required utility based on the time.
@@ -94,13 +96,13 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-			//LOGGER.info( "Offer, " + getUtility(bid));
+			LOGGER.info( "Offer, " + getUtility(bid));
 
 			return new Offer(getPartyId(), bid);
 
 		} else {
 
-			//LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
+			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
@@ -151,7 +153,11 @@ public class Group14 extends AbstractNegotiationParty {
 
 		double refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
 
-		minimumUtility.set(time);
+		if(STATE == NegotiationState.CONCEDING || STATE == NegotiationState.DEADLINE) {
+			minimumUtility.set(time, opponents.getConcessionRate());
+		} else {
+			minimumUtility.set(time, 0);
+		}
 
 		if(nextRefresh == null) {
 			nextRefresh = MEAN_MODEL_TIME + refreshDelta;

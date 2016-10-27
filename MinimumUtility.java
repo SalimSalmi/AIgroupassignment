@@ -16,15 +16,24 @@ public class MinimumUtility {
         this.minimum_end = minimum_end;
         this.curve = curve;
 
-        set(0);
+        set(0, 0);
     }
 
-    public void set(double time) {
+    public void set(double time, double concession) {
+
+        System.out.println("Concession rate: " + concession);
+
         utility = minimum_end + (1 - Math.pow(time, curve))*(minimum_start-minimum_end);
+
+        utility += (1 - Math.pow(time, 150))*(concession);
+
+        if (utility > 1) {
+            utility = 1;
+        }
+
     }
 
     public double get(){
-        //return 0.98;
         return utility;
     }
 

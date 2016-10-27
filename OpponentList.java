@@ -15,12 +15,19 @@ import java.util.Map;
  */
 public class OpponentList extends ArrayList<OpponentModel> {
 
+    private int BLOCK_SIZE;
+
+    public OpponentList(int BLOCK_SIZE){
+        super();
+        this.BLOCK_SIZE = BLOCK_SIZE;
+    }
+
     public OpponentModel getOpponent(AgentID sender, AbstractUtilitySpace utilSpace) {
 
         OpponentModel opponent;
 
         if (utilSpace instanceof AdditiveUtilitySpace)
-            opponent = new OpponentModelDiscrete(sender);
+            opponent = new OpponentModelDiscrete(sender, BLOCK_SIZE);
         else
             opponent = new OpponentModel(sender);
 
@@ -55,7 +62,6 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
 
             alphas.put(opponent, opponent.getDropRate());
-            System.out.println("Expected util : " + opponent.getExpectedMax() );
 
             dropsum += alphas.get(opponent);
 
@@ -78,9 +84,26 @@ public class OpponentList extends ArrayList<OpponentModel> {
         return alphas;
     }
 
+    public double getConcessionRate(){
+        double res = Double.MIN_VALUE;
+
+        for(int j = 0; j < this.size(); j++){
+
+            OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
+
+            double concession = opponent.getConcessionRate();
+
+            if(concession > res ) {
+                res = concession;
+            }
+        }
+
+        return res;
+    }
+
     public OpponentModel getAverageOpponentModel(AbstractUtilitySpace utilSpace) {
 
-        OpponentModelDiscrete opponentAvg = new OpponentModelDiscrete(null);
+        OpponentModelDiscrete opponentAvg = new OpponentModelDiscrete(null, 0);
 
         opponentAvg.init((AbstractUtilitySpace) utilSpace.copy());
 
