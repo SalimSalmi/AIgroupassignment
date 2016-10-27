@@ -28,6 +28,7 @@ public class BiddingStrategy {
     private OpponentModel averageOpponent;
     private ArrayList<Bid> topBids;
     private TreeMap<Double, Bid> topBidTree;
+    private ArrayList<Bid> bidsToCheck;
 
     public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents, float hardHeadedDeadline) {
         this.utilSpace = utilSpace;
@@ -39,12 +40,8 @@ public class BiddingStrategy {
 
         try {
             topBidTree = new TreeMap<>();
-            recursiveTopBids(utilSpace.getMaxUtilityBid(), topBidTree);
-            topBids = new ArrayList<>(topBidTree.values());
-            Collections.reverse(topBids);
-            hardHeadedDeadlineIndex = topBids.indexOf(topBidTree.ceilingEntry(minimumUtility.get(hardHeadedDeadline)).getValue());
-
-            System.out.println("Top bids : " + topBids);
+            bidsToCheck = new ArrayList<>();
+            bidsToCheck.add(utilSpace.getMaxUtilityBid());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,6 +69,21 @@ public class BiddingStrategy {
     }
 
     private Bid getNextHardHeaded(double time) {
+
+        if(bidsToCheck.size() > 0) {
+            try {
+                recursiveTopBids();
+                return utilSpace.getMaxUtilityBid();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            topBids = new ArrayList<>(topBidTree.values());
+            Collections.reverse(topBids);
+            hardHeadedDeadlineIndex = topBids.indexOf(topBidTree.ceilingEntry(minimumUtility.get(hardHeadedDeadline)).getValue());
+            System.out.println(topBids);
+        }
+
         if(time / hardHeadedDeadline <=1) {
             // Return our bids above our minimum utility in order of decreasing utility.
             return topBids.get((int) Math.floor(time / hardHeadedDeadline * hardHeadedDeadlineIndex));
@@ -135,34 +147,46 @@ public class BiddingStrategy {
         return bid;
     }
 
-    private void recursiveTopBids(Bid bid, TreeMap<Double, Bid> treeMap) {
+    private void recursiveTopBids() {
 
-        treeMap.put(utilSpace.getUtility(bid), bid);
+        if(bidsToCheck.size() == 0) {
+            return;
+        }
 
-        for (Map.Entry<Integer, Value> issue : bid.getValues().entrySet()) {
+        int index = 200 < bidsToCheck.size() ? 200: bidsToCheck.size();
 
-            double currentIssue = values.get(issue.getKey()).get(issue.getValue());
-            double maxValue = 0;
+        ArrayList<Bid> bids = new ArrayList<>(bidsToCheck.subList(0, index));
+        bidsToCheck.removeAll(bidsToCheck.subList(0, index));
 
-            Bid newBid = new Bid(bid);
+        for(Bid bid : bids) {
+            topBidTree.put(utilSpace.getUtility(bid), bid);
 
-            for (Map.Entry<Value, Double> value : values.get(issue.getKey()).entrySet()) {
+            for (Map.Entry<Integer, Value> issue : bid.getValues().entrySet()) {
 
-                double current = value.getValue();
+                double currentIssue = values.get(issue.getKey()).get(issue.getValue());
+                double maxValue = 0;
 
-                if(current < currentIssue && current >= maxValue) {
-                    maxValue = current;
-                    newBid = newBid.putValue(issue.getKey(), value.getKey());
+                Bid newBid = new Bid(bid);
+
+                for (Map.Entry<Value, Double> value : values.get(issue.getKey()).entrySet()) {
+
+                    double current = value.getValue();
+
+                    if (current < currentIssue && current >= maxValue) {
+                        maxValue = current;
+                        newBid = newBid.putValue(issue.getKey(), value.getKey());
+                    }
+
                 }
 
-            }
-
-            if (utilSpace.getUtility(newBid) < minimumUtility.get(1) ) {
-            } else if(treeMap.containsValue(newBid)) {
-            } else {
-                recursiveTopBids(newBid, treeMap);
+                if (utilSpace.getUtility(newBid) < minimumUtility.get(1)) {
+                } else if (topBidTree.containsValue(newBid)) {
+                } else {
+                    bidsToCheck.add(newBid);
+                }
             }
         }
+
     }
 
     private void setEvalValues() {

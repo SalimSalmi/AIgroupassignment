@@ -94,12 +94,12 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-			LOGGER.info( "Offer, " + getUtility(bid));
+//			LOGGER.info( "Offer, " + getUtility(bid));
 
 			return new Offer(getPartyId(), bid);
 
 		} else {
-			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
+//			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
