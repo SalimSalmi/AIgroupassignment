@@ -10,13 +10,16 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.*;
 
 /**
  * This is your negotiation party.
  */
 public class Group14 extends AbstractNegotiationParty {
+
+	private static final Logger LOGGER = Logger.getLogger( Group14.class.getName() );
 
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
 	private final float MEAN_MODEL_TIME = 0.6f; // Deadline to start calculating the mean model
@@ -36,9 +39,7 @@ public class Group14 extends AbstractNegotiationParty {
 	private OpponentList opponents = new OpponentList(); // List of opponent models
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
 	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
-	private MinimumUtility minimumUtility;
-
-	private ArrayList<Double> bidUtils = new ArrayList<>();
+	private MinimumUtility minimumUtility; // The function for deciding the minimum required utility based on the time.
 
 	@Override
 	public void init(AbstractUtilitySpace utilSpace, Deadline dl,
@@ -53,6 +54,18 @@ public class Group14 extends AbstractNegotiationParty {
 
 		// if you need to initialize some variables, please initialize them
 		// below
+
+		try {
+			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14.log", 8096, 1, true);
+			LOGGER.addHandler(fh);
+
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
 
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
@@ -81,10 +94,13 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-			bidUtils.add(getUtility(bid));
+			LOGGER.info( "Offering bid, " + getUtility(bid));
+
 			return new Offer(getPartyId(), bid);
 
 		} else {
+			LOGGER.info( "Accepting bid, " + getUtility(lastReceivedBid));
+
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
 
@@ -123,7 +139,6 @@ public class Group14 extends AbstractNegotiationParty {
 		}
 
 	}
-
 
 	@Override
 	public String getDescription() {

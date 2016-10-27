@@ -23,11 +23,7 @@ public class AcceptanceStrategy {
 
     public boolean accept(Bid bid, Bid nextBid){
 
-        boolean accept = false;
-
-        if ( utilSpace.getUtility(bid) > minimumUtility.get() ){
-            System.out.println("The util is : " + utilSpace.getUtility(bid) + ", the min util is : " + minimumUtility.get());
-        }
+        boolean accept;
 
         // If the utility of our upcoming bid is lower than the bid we received then accept;
         if(utilSpace.getUtility(nextBid) < utilSpace.getUtility(bid)) {

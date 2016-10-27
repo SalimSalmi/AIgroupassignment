@@ -99,7 +99,6 @@ public class BiddingStrategy {
 
 
         if(utilSpace.getUtility(nextBid) > minimumUtility.get()) {
-            System.out.println("Lowering, minimum util: " + minimumUtility.get() + ", next bid: " + utilSpace.getUtility(nextBid));
             currentBid = nextBid;
         }
 
@@ -158,9 +157,7 @@ public class BiddingStrategy {
             }
 
             if (utilSpace.getUtility(newBid) < minimumUtility.get(1) ) {
-                System.out.println("Stop at utility: " + utilSpace.getUtility(bid));
             } else if(treeMap.containsValue(newBid)) {
-                System.out.println("Already contains this bid");
             } else {
                 recursiveTopBids(newBid, treeMap);
             }
@@ -196,96 +193,96 @@ public class BiddingStrategy {
         }
     }
 
-    private Bid getReducedBid(Bid target, Bid current) {
-
-        // If the bids are already the same utility return the target.
-        if(utilSpace.getUtility(target) == utilSpace.getUtility(current)) {
-            return target;
-        } if(utilSpace.getUtility(target) > utilSpace.getUtility(current)) {
-            return getIncreasedBid(target, current);
-        }
-
-        // Calculate on which issue the values of the bids are furthest away.
-        double maxValue = 0;
-        int index = -1;
-        for (Map.Entry<Integer, Value> pair : target.getValues().entrySet()) {
-
-            double vTarget = values.get(pair.getKey()).get(pair.getValue());
-            double vCurrent = values.get(pair.getKey()).get(current.getValue(pair.getKey()));
-            double d = (vCurrent - vTarget) / weights.get(pair.getKey());
-
-            if(d > maxValue){
-                maxValue = d;
-                index = pair.getKey();
-            }
-        }
-
-        // For the found issue move the value of the current bid one step closer to the target bid.
-        if(index >= 0) {
-            Bid newBid = new Bid(current);
-            double vCurrent = values.get(index).get(current.getValue(index));
-
-            if(maxValue == 0) {
-                return newBid.putValue(index, target.getValue(index));
-            }
-
-            maxValue = 0;
-            for (Map.Entry<Value, Double> pair : values.get(index).entrySet()) {
-
-                double value = values.get(index).get(pair.getKey());
-
-                if(value < vCurrent && value >= maxValue) {
-                    maxValue = value;
-                    newBid = newBid.putValue(index, pair.getKey());
-                }
-
-            }
-
-            return newBid;
-        }
-
-        return current;
-    }
-
-    private Bid getIncreasedBid(Bid target, Bid current) {
-
-        // Calculate on which issue the values of the bids are furthest away.
-        double maxValue = 0;
-        int index = -1;
-        for (Map.Entry<Integer, Value> pair : target.getValues().entrySet()) {
-
-            double vTarget = values.get(pair.getKey()).get(pair.getValue());
-            double vCurrent = values.get(pair.getKey()).get(current.getValue(pair.getKey()));
-            double d = (vTarget - vCurrent) * weights.get(pair.getKey());
-
-            if(d > maxValue){
-                maxValue = d;
-                index = pair.getKey();
-            }
-        }
-
-        // For the found issue move the value of the current bid one step closer to the target bid.
-        if(index >= 0) {
-            Bid newBid = new Bid(current);
-            double vCurrent = values.get(index).get(current.getValue(index));
-
-            if(maxValue == 0) {
-                return newBid.putValue(index, target.getValue(index));
-            }
-
-            maxValue = Integer.MAX_VALUE;
-            for (Map.Entry<Value, Double> pair : values.get(index).entrySet()) {
-
-                double value = values.get(index).get(pair.getKey());
-
-                if(value > vCurrent && value < maxValue) {
-                    maxValue = value;
-                    newBid = newBid.putValue(index, pair.getKey());
-                }
-            }
-            return newBid;
-        }
-
-        return current;
-    }
+//    private Bid getReducedBid(Bid target, Bid current) {
+//
+//        // If the bids are already the same utility return the target.
+//        if(utilSpace.getUtility(target) == utilSpace.getUtility(current)) {
+//            return target;
+//        } if(utilSpace.getUtility(target) > utilSpace.getUtility(current)) {
+//            return getIncreasedBid(target, current);
+//        }
+//
+//        // Calculate on which issue the values of the bids are furthest away.
+//        double maxValue = 0;
+//        int index = -1;
+//        for (Map.Entry<Integer, Value> pair : target.getValues().entrySet()) {
+//
+//            double vTarget = values.get(pair.getKey()).get(pair.getValue());
+//            double vCurrent = values.get(pair.getKey()).get(current.getValue(pair.getKey()));
+//            double d = (vCurrent - vTarget) / weights.get(pair.getKey());
+//
+//            if(d > maxValue){
+//                maxValue = d;
+//                index = pair.getKey();
+//            }
+//        }
+//
+//        // For the found issue move the value of the current bid one step closer to the target bid.
+//        if(index >= 0) {
+//            Bid newBid = new Bid(current);
+//            double vCurrent = values.get(index).get(current.getValue(index));
+//
+//            if(maxValue == 0) {
+//                return newBid.putValue(index, target.getValue(index));
+//            }
+//
+//            maxValue = 0;
+//            for (Map.Entry<Value, Double> pair : values.get(index).entrySet()) {
+//
+//                double value = values.get(index).get(pair.getKey());
+//
+//                if(value < vCurrent && value >= maxValue) {
+//                    maxValue = value;
+//                    newBid = newBid.putValue(index, pair.getKey());
+//                }
+//
+//            }
+//
+//            return newBid;
+//        }
+//
+//        return current;
+//    }
+//
+//    private Bid getIncreasedBid(Bid target, Bid current) {
+//
+//        // Calculate on which issue the values of the bids are furthest away.
+//        double maxValue = 0;
+//        int index = -1;
+//        for (Map.Entry<Integer, Value> pair : target.getValues().entrySet()) {
+//
+//            double vTarget = values.get(pair.getKey()).get(pair.getValue());
+//            double vCurrent = values.get(pair.getKey()).get(current.getValue(pair.getKey()));
+//            double d = (vTarget - vCurrent) * weights.get(pair.getKey());
+//
+//            if(d > maxValue){
+//                maxValue = d;
+//                index = pair.getKey();
+//            }
+//        }
+//
+//        // For the found issue move the value of the current bid one step closer to the target bid.
+//        if(index >= 0) {
+//            Bid newBid = new Bid(current);
+//            double vCurrent = values.get(index).get(current.getValue(index));
+//
+//            if(maxValue == 0) {
+//                return newBid.putValue(index, target.getValue(index));
+//            }
+//
+//            maxValue = Integer.MAX_VALUE;
+//            for (Map.Entry<Value, Double> pair : values.get(index).entrySet()) {
+//
+//                double value = values.get(index).get(pair.getKey());
+//
+//                if(value > vCurrent && value < maxValue) {
+//                    maxValue = value;
+//                    newBid = newBid.putValue(index, pair.getKey());
+//                }
+//            }
+//            return newBid;
+//        }
+//
+//        return current;
+//    }
 }

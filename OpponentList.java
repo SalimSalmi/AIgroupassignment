@@ -48,15 +48,11 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         double dropsum = 0;
 
-        //System.out.println("size of opponentlist " + this.size());
-
 
         for(int j = 0; j < this.size(); j++){
 
             OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
-            //double numer = entry.getValue();
 
-            System.out.println("The decreasing rate for opponent" + j + opponent.getDropRate());
 
             alphas.put(opponent, opponent.getDropRate());
 
@@ -66,7 +62,7 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
         for(Map.Entry<OpponentModelDiscrete, Double> entry : alphas.entrySet()){
 
-            OpponentModelDiscrete opponent = (OpponentModelDiscrete) entry.getKey();
+            OpponentModelDiscrete opponent = entry.getKey();
 
             double number = entry.getValue();
 
@@ -74,7 +70,6 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
             alphas.put(opponent, inverse_average_rate);
 
-            //System.out.println("The normalized decreasing rate for"+ inverse_average_rate);
 
         }
 
@@ -106,15 +101,12 @@ public class OpponentList extends ArrayList<OpponentModel> {
                 for(Map.Entry<OpponentModelDiscrete, Double> entry : alpha.entrySet()){
 
 
-                    OpponentModelDiscrete oppNew = (OpponentModelDiscrete) entry.getKey();
+                    OpponentModelDiscrete oppNew = entry.getKey();
 
                     EvaluatorDiscrete evaluatorIndex = (EvaluatorDiscrete) oppNew.getUtilSpace().getEvaluator(i);
 
-                    //System.out.println("The weight for opponent " + k  + " some evaluator "+ i +"is"+ evaluatorIndex.getWeight());
 
                     valueAvg = valueAvg + alpha.get(oppNew) * evaluatorIndex.getValue(value);
-
-                    //System.out.println("The rate for opponent" + k + "is" + alpha.get(oppNew));
 
                     weightAvg = weightAvg + alpha.get(oppNew) * evaluatorIndex.getWeight();//Put the alpha value here
 
@@ -123,13 +115,10 @@ public class OpponentList extends ArrayList<OpponentModel> {
                 }
 
                 try {
-                    //System.out.print("The value average for evaluator "+ i +"is "+valueAvg);
                     evaluator.setEvaluationDouble(value, valueAvg);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                //System.out.println("The average weight for agent for some evaluator "+ i +"is"+weightAvg);
 
                 evaluator.setWeight(weightAvg);
 
