@@ -24,6 +24,7 @@ public class MinimumUtility {
     }
 
     public double get(){
+        //return 0.98;
         return utility;
     }
 

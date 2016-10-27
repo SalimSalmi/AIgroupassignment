@@ -28,7 +28,7 @@ public class OpponentModel {
 
     }
 
-    public void pushBid(Bid bid) {}
+    public void pushBid(Bid bid, double ownUtil) {}
 
     public AgentID getAgentID() {
         return agentID;

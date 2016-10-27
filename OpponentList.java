@@ -55,6 +55,7 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
 
             alphas.put(opponent, opponent.getDropRate());
+            System.out.println("Expected util : " + opponent.getExpectedMax() );
 
             dropsum += alphas.get(opponent);
 
