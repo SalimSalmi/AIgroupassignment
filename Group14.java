@@ -22,13 +22,13 @@ public class Group14 extends AbstractNegotiationParty {
 	private static final Logger LOGGER = Logger.getLogger( Group14.class.getName() );
 
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
-	private final float MEAN_MODEL_TIME = 0.6f; // Deadline to start calculating the mean model
+	private final float MEAN_MODEL_TIME = 0.35f; // Deadline to start calculating the mean model
 	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
 	private final int REFRESH_MEAN = 10; // Amount of times the mean model is being refreshed
 	private Double nextRefresh; // Next time the mean model needs to be calculated.
 
-	private final float MINIMUM_UTILITY_START = 0.9f;
-	private final float MINIMUM_UTILITY_END = 0.5f;
+	private final float MINIMUM_UTILITY_START = 0.95f;
+	private final float MINIMUM_UTILITY_END = 0.45f;
 	private final float CONCESSION_CURVE = 20;
 
 	//The state of the negotiation we are in, will change depending on the time left.
@@ -56,10 +56,10 @@ public class Group14 extends AbstractNegotiationParty {
 		// below
 
 		try {
-			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14.log", 8096, 1, true);
+			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14.log");
 			LOGGER.addHandler(fh);
 
-			SimpleFormatter formatter = new SimpleFormatter();
+			NegotiationLogFormatter formatter = new NegotiationLogFormatter();
 			fh.setFormatter(formatter);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -94,12 +94,12 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-			LOGGER.info( "Offering bid, " + getUtility(bid));
+			LOGGER.info( "Offer, " + getUtility(bid));
 
 			return new Offer(getPartyId(), bid);
 
 		} else {
-			LOGGER.info( "Accepting bid, " + getUtility(lastReceivedBid));
+			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}

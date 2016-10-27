@@ -44,6 +44,7 @@ public class BiddingStrategy {
             Collections.reverse(topBids);
             hardHeadedDeadlineIndex = topBids.indexOf(topBidTree.ceilingEntry(minimumUtility.get(hardHeadedDeadline)).getValue());
 
+            System.out.println("Top bids : " + topBids);
         } catch (Exception e) {
             e.printStackTrace();
         }
