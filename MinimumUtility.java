@@ -21,16 +21,23 @@ public class MinimumUtility {
 
     public void set(double time, double concession) {
 
-        System.out.println("Concession rate: " + concession);
+        double utilityModeling = (1 - 2*Math.pow(time, 2));
 
-        utility = minimum_end + (1 - Math.pow(time, curve))*(minimum_start-minimum_end);
+        double utilityConceding = minimum_end + (1 - Math.pow(time, curve))*(minimum_start-minimum_end);
 
-        utility += (1 - Math.pow(time, 150))*(concession);
+        utilityConceding += (1 - Math.pow(time, 150))*(concession);
 
-        if (utility > 1) {
-            utility = 1;
+        if (utilityConceding > 1) {
+            utilityConceding = 1;
         }
 
+        if(utilityModeling > utilityConceding) {
+            System.out.println("Modeling utility: " + utilityModeling);
+            utility = utilityModeling;
+        } else {
+            System.out.println("Conceding utility: " + utilityConceding + " with concession rate:" + concession);
+            utility = utilityConceding;
+        }
     }
 
     public double get(){

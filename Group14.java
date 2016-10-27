@@ -11,8 +11,14 @@ import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 /**
  * This is your negotiation party.
@@ -25,13 +31,14 @@ public class Group14 extends AbstractNegotiationParty {
 	private final float MEAN_MODEL_TIME = 0.35f; // Deadline to start calculating the mean model
 	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
 	private final int REFRESH_MEAN = 20; // Amount of times the mean model is being refreshed
-	private Double nextRefresh; // Next time the mean model needs to be calculated.
+	private float nextRefresh = MEAN_MODEL_TIME; // Next time the mean model needs to be calculated.
 
 	private final int BLOCK_SIZE = 5; // Size of bids to consider when calculating the concession.
+	private final int RANDOM_SAMPLE = 30;
 
-	private final float MINIMUM_UTILITY_START = 0.95f;
+	private final float MINIMUM_UTILITY_START = 0.9f;
 	private final float MINIMUM_UTILITY_END = 0.0f;
-	private final float CONCESSION_CURVE = 20;
+	private final float CONCESSION_CURVE = 30;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
@@ -58,7 +65,15 @@ public class Group14 extends AbstractNegotiationParty {
 		// below
 
 		try {
-			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14.log");
+			Handler[] handlers = LOGGER.getHandlers();
+
+			for(int i = 0; i < handlers.length; i++) {
+				LOGGER.removeHandler(handlers[i]);
+			}
+
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+			Calendar cal = Calendar.getInstance();
+			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14-" + dateFormat.format(cal.getTime()) +" .log");
 			LOGGER.addHandler(fh);
 
 			NegotiationLogFormatter formatter = new NegotiationLogFormatter();
@@ -67,11 +82,9 @@ public class Group14 extends AbstractNegotiationParty {
 			e.printStackTrace();
 		}
 
-
-
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
-		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents, MEAN_MODEL_TIME);
+		biddingStrategy = new BiddingStrategy(utilSpace, opponents);
 
 	}
 
@@ -91,7 +104,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 		updateTimeAndState(time);
 
-		Bid bid = biddingStrategy.getNextBid(STATE, time);
+		Bid bid = biddingStrategy.getNextBid(STATE, getNRandomBids(RANDOM_SAMPLE));
 
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
@@ -123,6 +136,9 @@ public class Group14 extends AbstractNegotiationParty {
 	public void receiveMessage(AgentID sender, Action action) {
 		super.receiveMessage(sender, action);
 
+		generateRandomBid();
+
+
 		if (action instanceof Offer) {
 			lastReceivedBid = ((Offer) action).getBid();
 		}
@@ -151,7 +167,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private void updateTimeAndState(double time){
 
-		double refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
+		float refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
 
 		if(STATE == NegotiationState.CONCEDING || STATE == NegotiationState.DEADLINE) {
 			minimumUtility.set(time, opponents.getConcessionRate());
@@ -159,12 +175,6 @@ public class Group14 extends AbstractNegotiationParty {
 			minimumUtility.set(time, 0);
 		}
 
-		if(nextRefresh == null) {
-			nextRefresh = MEAN_MODEL_TIME + refreshDelta;
-		} else if(nextRefresh < time) {
-			biddingStrategy.updateAverageOpponent();
-			nextRefresh += refreshDelta;
-		}
 
 		if(time > CONCEDE_TIME) {
 			STATE = NegotiationState.DEADLINE;
@@ -174,5 +184,33 @@ public class Group14 extends AbstractNegotiationParty {
 			STATE = NegotiationState.MEAN_MODELING;
 		}
 
+		if(time > nextRefresh) {
+			biddingStrategy.updateAverageOpponent();
+			nextRefresh += refreshDelta;
+		}
+	}
+
+	private ArrayList<Bid> getNRandomBids(int sampleSize){
+		ArrayList<Bid> bids = new ArrayList<>();
+
+		// Always add the max utility bid
+		try {
+			bids.add(getUtilitySpace().getMaxUtilityBid());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		int i = 0;
+		do {
+			Bid bid = generateRandomBid();
+			if(getUtility(bid) > minimumUtility.get()) {
+				bids.add(bid);
+			}
+			i++;
+		} while (bids.size() <= sampleSize && i < 10000);
+
+		System.out.println("It took " + i + " loops with min value: " + minimumUtility.get());
+
+		return bids;
 	}
 }

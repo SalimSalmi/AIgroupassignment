@@ -58,11 +58,10 @@ public class OpponentModelDiscrete extends OpponentModel{
     @Override
     public void pushBid(Bid bid, double ownUtil){
 
-
         // Add bid to bid history
         bids.add(bid);
+        // Add utils of our own Agent for the bid to history
         ownUtils.add(ownUtil);
-
 
         if(modeling){
 
@@ -80,27 +79,25 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     public double getConcessionRate(){
 
-        double mean = getMean();
-        double dev = getDeviation();
+        int startMean = ownUtils.size() - 3*BLOCK_SIZE;
+        int endMean = ownUtils.size() - BLOCK_SIZE;
+
+        if (ownUtils.size() < 3*BLOCK_SIZE) {
+            startMean = 0;
+            endMean = (int) Math.floor(2*ownUtils.size()/3);
+        }
+
+        double mean = getAverage(startMean, endMean);
+        double dev = getAverage(endMean, ownUtils.size());
 
         return 1 - (mean/dev);
     }
 
-    private double getMean(){
-        double result = 0;
-        for(Double util : ownUtils){
-
-            result += util;
-
-        }
-        result = result / ownUtils.size();
-        return result;
-    }
-    private double getDeviation(){
+    private double getAverage(int start, int end){
         double result = 0;
         List<Double> block = new ArrayList();
         block.addAll(ownUtils);
-        block = block.subList(block.size() - BLOCK_SIZE, block.size());
+        block = block.subList(start, end);
 
         for(Double util : block){
             result += util;
@@ -109,6 +106,7 @@ public class OpponentModelDiscrete extends OpponentModel{
 
         return result;
     }
+
 
     private void updateModel(Bid bid){
 
