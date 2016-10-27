@@ -28,8 +28,8 @@ public class Group14 extends AbstractNegotiationParty {
 	private Double nextRefresh; // Next time the mean model needs to be calculated.
 
 	private final float MINIMUM_UTILITY_START = 0.95f;
-	private final float MINIMUM_UTILITY_END = 0.45f;
-	private final float CONCESSION_CURVE = 20;
+	private final float MINIMUM_UTILITY_END = 0.6f;
+	private final float CONCESSION_CURVE = 120;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
@@ -94,12 +94,13 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-//			LOGGER.info( "Offer, " + getUtility(bid));
+			//LOGGER.info( "Offer, " + getUtility(bid));
 
 			return new Offer(getPartyId(), bid);
 
 		} else {
-//			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
+
+			//LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
@@ -129,12 +130,12 @@ public class Group14 extends AbstractNegotiationParty {
 
 			if (action instanceof Offer) {
 				Bid bid = ((Offer) action).getBid();
-				opponent.pushBid(bid);
+				opponent.pushBid(bid,getUtility(bid));
 			}
 
 			if (action instanceof Accept) {
 				Bid bid = ((Accept) action).getBid();
-				opponent.pushBid(bid);
+				opponent.pushBid(bid,getUtility(bid));
 			}
 		}
 

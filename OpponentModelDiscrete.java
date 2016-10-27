@@ -9,6 +9,7 @@ import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class OpponentModelDiscrete extends OpponentModel{
     private AdditiveUtilitySpace utilSpace;
 
     private ArrayList<Bid> bids = new ArrayList<>();
+    private HashMap<Bid,Double> ownUtils = new HashMap<>();
     private boolean modeling = true;
 
     private ArrayList<ArrayList<ValueDiscrete>> issues = new ArrayList<>();
@@ -58,11 +60,12 @@ public class OpponentModelDiscrete extends OpponentModel{
 
 
     @Override
-    public void pushBid(Bid bid){
+    public void pushBid(Bid bid, double ownUtil){
 
 
         // Add bid to bid history
         bids.add(bid);
+        ownUtils.put(bid,ownUtil);
 
 
 
@@ -78,6 +81,37 @@ public class OpponentModelDiscrete extends OpponentModel{
 
         return utilSpace;
 
+    }
+
+    public double getExpectedMax(){
+
+        double mean = getMean();
+        double dev = getDeviation(mean);
+
+        return mean + (1- mean)* dev;
+    }
+
+    private double getMean(){
+        double result = 0;
+        for(Double util : ownUtils.values()){
+
+            
+
+            result += util;
+
+        }
+        result = result / ownUtils.size();
+        return result;
+    }
+    private double getDeviation(double mean){
+        double result = 0;
+        for(Double util : ownUtils.values()){
+            result += Math.pow(util,2) - Math.pow(mean,2);
+
+        }
+        result = result / ownUtils.size();
+
+        return result;
     }
 
     private void updateModel(Bid bid){
@@ -198,5 +232,7 @@ public class OpponentModelDiscrete extends OpponentModel{
         //return 1;
 
     }
+
+
 
 }
