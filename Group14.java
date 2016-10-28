@@ -29,7 +29,7 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
 	private final float MEAN_MODEL_TIME = 0.35f; // Deadline to start calculating the mean model
-	private final float CONCEDE_TIME = 0.9f; // Deadline to hard concede
+	private final float CONCEDE_TIME = 0.99f; // Deadline until hard concede
 	private final int REFRESH_MEAN = 20; // Amount of times the mean model is being refreshed
 	private float nextRefresh = MEAN_MODEL_TIME; // Next time the mean model needs to be calculated.
 
@@ -84,7 +84,7 @@ public class Group14 extends AbstractNegotiationParty {
 		}
 
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
-		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
+		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility);
 		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents);
 
 		try {
@@ -114,7 +114,7 @@ public class Group14 extends AbstractNegotiationParty {
 		Bid bid = biddingStrategy.getNextBid(STATE, getNRandomBids(RANDOM_SAMPLE));
 
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
-				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
+				|| !acceptanceStrategy.accept(lastReceivedBid, bid, STATE)) {
 
 //			LOGGER.info( "Offer, " + getUtility(bid));
 

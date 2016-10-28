@@ -10,18 +10,22 @@ public class AcceptanceStrategy {
 
     private AbstractUtilitySpace utilSpace;
     private MinimumUtility minimumUtility;
-    private OpponentList opponents;
 
     private Bid previousAccepted;
 
 
-    public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
+    public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility) {
         this.utilSpace = utilSpace;
         this.minimumUtility = minimumUtility;
-        this.opponents = opponents;
     }
 
-    public boolean accept(Bid bid, Bid nextBid){
+    public boolean accept(Bid bid, Bid nextBid, NegotiationState state){
+
+        float deadlineRatio = 1;
+
+        if(state == NegotiationState.DEADLINE) {
+            deadlineRatio = 0.75f;
+        }
 
         boolean accept;
 
@@ -29,7 +33,7 @@ public class AcceptanceStrategy {
         if(utilSpace.getUtility(nextBid) < utilSpace.getUtility(bid)) {
             accept = true;
         } else {
-            accept = utilSpace.getUtility(bid) > minimumUtility.get();
+            accept = utilSpace.getUtility(bid) > minimumUtility.get() * deadlineRatio;
         }
 
         // If we get the same bid again that we accepted last round, give our own bid.
