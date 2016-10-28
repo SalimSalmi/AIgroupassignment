@@ -13,11 +13,28 @@ public class AcceptanceStrategy {
 
     private Bid previousAccepted;
 
+    /**
+     * Judges if a bid should be accepted or not.
+     *
+     * @param utilSpace The utility space of the agent
+     * @param minimumUtility The minimum utility curve
+     *
+     * @return True if the bid is accepted, false otherwise.
+     */
     public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility) {
         this.utilSpace = utilSpace;
         this.minimumUtility = minimumUtility;
     }
 
+    /**
+     * Judges if a bid should be accepted or not.
+     *
+     * @param bid The bid which should be judged
+     * @param nextBid The bid which the agent will give next
+     * @param state The state the negotiation is in
+     *
+     * @return True if the bid is accepted, false otherwise.
+     */
     public boolean accept(Bid bid, Bid nextBid, NegotiationState state){
 
         // Set a ratio to the minimum utility we will accept.
