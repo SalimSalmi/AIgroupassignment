@@ -80,7 +80,7 @@ public class OpponentModel {
     public double getDropRate(){
 
         double average = 0;
-        int interval = 10;///Set it later
+        int interval = 10;
         int count = 0;
         double avg_final = 0;
 
@@ -89,7 +89,6 @@ public class OpponentModel {
             double avg_temp = 0;
 
             double prev = utilSpace.getUtility(bids.get(i-1));
-
 
             for(int j=i; j< (i+interval);j++ ){
 
@@ -106,11 +105,7 @@ public class OpponentModel {
         }
 
         avg_final = (average / count);
-        //System.out.println("The decreasing rate is"+ avg_final);
 
         return avg_final;
-
-        //return 1;
-
     }
 }

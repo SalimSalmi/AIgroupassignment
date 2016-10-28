@@ -10,14 +10,8 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.session.TimeLineInfo;
 import negotiator.utility.AbstractUtilitySpace;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 /**
@@ -36,9 +30,9 @@ public class Group14 extends AbstractNegotiationParty {
 	private final int RANDOM_SAMPLE = 30; // Amount of random samples we try to get above the min utility
 	private final int SAMPLE_BOUND = 2500; // Amount of runs we maximally do to get the random samples.
 
-	private final float MINIMUM_UTILITY_START = 0.9f;
-	private final float MINIMUM_UTILITY_END = 0.0f;
-	private final float CONCESSION_CURVE = 10;
+	private final float MINIMUM_UTILITY_START = 0.9f; // Starting utility
+	private final float MINIMUM_UTILITY_END = 0.0f; // Ending utility
+	private final float CONCESSION_CURVE = 10; // Concession speed
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
@@ -64,24 +58,6 @@ public class Group14 extends AbstractNegotiationParty {
 
 		// if you need to initialize some variables, please initialize them
 		// below
-
-		try {
-			Handler[] handlers = LOGGER.getHandlers();
-
-			for(int i = 0; i < handlers.length; i++) {
-				LOGGER.removeHandler(handlers[i]);
-			}
-
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-			Calendar cal = Calendar.getInstance();
-			Handler fh = new FileHandler("%h/Projects/java/logs/ai2016/group14-" + dateFormat.format(cal.getTime()) +" .log");
-			LOGGER.addHandler(fh);
-
-			NegotiationLogFormatter formatter = new NegotiationLogFormatter();
-			fh.setFormatter(formatter);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility);
@@ -116,14 +92,9 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid, STATE)) {
 
-//			LOGGER.info( "Offer, " + getUtility(bid));
-
 			return new Offer(getPartyId(), bid);
 
 		} else {
-
-//			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
-
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
 
@@ -215,9 +186,7 @@ public class Group14 extends AbstractNegotiationParty {
 			}
 			i++;
 		} while (bids.size() <= sampleSize && i < SAMPLE_BOUND);
-
-//		System.out.println("It took " + i + " loops with min value: " + minimumUtility.get());
-
+		
 		return bids;
 	}
 }
