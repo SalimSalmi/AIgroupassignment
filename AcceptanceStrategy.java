@@ -18,8 +18,6 @@ public class AcceptanceStrategy {
      *
      * @param utilSpace The utility space of the agent
      * @param minimumUtility The minimum utility curve
-     *
-     * @return True if the bid is accepted, false otherwise.
      */
     public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility) {
         this.utilSpace = utilSpace;

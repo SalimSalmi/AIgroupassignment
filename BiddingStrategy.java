@@ -17,6 +17,14 @@ public class BiddingStrategy {
     private OpponentModel averageOpponent;
     private MinimumUtility minimumUtility;
 
+
+    /**
+     * Create a bidding strategy which decides which bids to give
+     *
+     * @param utilSpace The utility space of the agent
+     * @param minimumUtility The minimum utility curve
+     * @param opponents The list of opponents
+     */
     public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
         this.utilSpace = utilSpace;
         this.opponents = opponents;
@@ -29,6 +37,14 @@ public class BiddingStrategy {
         }
     }
 
+    /**
+     * Get the next bid the agent will give according to the state of the negotiation.
+     *
+     * @param STATE The state the negotiation is in.
+     * @param samples List of bid samples above the minimum utility.
+     *
+     * @return True if the bid is accepted, false otherwise.
+     */
     public Bid getNextBid(NegotiationState STATE, ArrayList<Bid> samples) {
         Bid bid;
         switch (STATE) {
@@ -50,8 +66,9 @@ public class BiddingStrategy {
         return bid;
     }
 
-    // Get the lowest bid (closest to reservation curve).
     private Bid getNextNaiveBid(ArrayList<Bid> samples) {
+        // Get the lowest bid (closest to reservation curve).
+
         if (samples.size() == 0) {
             return maxBid;
         }
@@ -69,6 +86,7 @@ public class BiddingStrategy {
     }
 
     private Bid getNextConcessionBid(ArrayList<Bid> samples) {
+        // Get the bid that maximizes the average opponent utility.
 
         if (samples.size() == 0) {
             return maxBid;
@@ -87,6 +105,9 @@ public class BiddingStrategy {
 
     }
 
+    /**
+     * Recalculates the average opponent model.
+     */
     public void updateAverageOpponent() {
         averageOpponent = opponents.getAverageOpponentModel(utilSpace);
 
