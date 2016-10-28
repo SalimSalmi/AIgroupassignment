@@ -15,10 +15,12 @@ public class BiddingStrategy {
 
     private Bid maxBid;
     private OpponentModel averageOpponent;
+    private MinimumUtility minimumUtility;
 
-    public BiddingStrategy(AbstractUtilitySpace utilSpace, OpponentList opponents) {
+    public BiddingStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility, OpponentList opponents) {
         this.utilSpace = utilSpace;
         this.opponents = opponents;
+        this.minimumUtility = minimumUtility;
 
         try {
             maxBid = utilSpace.getMaxUtilityBid();
@@ -86,5 +88,12 @@ public class BiddingStrategy {
 
     public void updateAverageOpponent() {
         averageOpponent = opponents.getAverageOpponentModel(utilSpace);
+
+        try {
+            minimumUtility.goal(utilSpace.getUtility(averageOpponent.getUtilSpace().getMaxUtilityBid()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 }

@@ -38,12 +38,13 @@ public class Group14 extends AbstractNegotiationParty {
 
 	private final float MINIMUM_UTILITY_START = 0.9f;
 	private final float MINIMUM_UTILITY_END = 0.0f;
-	private final float CONCESSION_CURVE = 30;
+	private final float CONCESSION_CURVE = 5;
 
 	//The state of the negotiation we are in, will change depending on the time left.
 	private NegotiationState STATE = NegotiationState.OPPONENT_MODELING;
 
 	private Bid lastReceivedBid = null;
+	private Bid maxBid;
 
 	private OpponentList opponents = new OpponentList(BLOCK_SIZE); // List of opponent models
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
@@ -84,7 +85,13 @@ public class Group14 extends AbstractNegotiationParty {
 
 		minimumUtility = new MinimumUtility(MINIMUM_UTILITY_START, MINIMUM_UTILITY_END, CONCESSION_CURVE);
 		acceptanceStrategy = new AcceptanceStrategy(utilSpace, minimumUtility, opponents);
-		biddingStrategy = new BiddingStrategy(utilSpace, opponents);
+		biddingStrategy = new BiddingStrategy(utilSpace, minimumUtility, opponents);
+
+		try {
+			maxBid = utilSpace.getMaxUtilityBid();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -187,6 +194,10 @@ public class Group14 extends AbstractNegotiationParty {
 		if(time > nextRefresh) {
 			biddingStrategy.updateAverageOpponent();
 			nextRefresh += refreshDelta;
+		}
+
+		if(time > MEAN_MODEL_TIME) {
+			minimumUtility.minDistance(opponents.getRelativeDistance(maxBid));
 		}
 	}
 

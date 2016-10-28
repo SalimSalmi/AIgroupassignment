@@ -10,6 +10,7 @@ public class MinimumUtility {
     private float curve;
 
     private double utility;
+    private double minimum_dis = 0;
 
     public MinimumUtility(float minimum_start, float minimum_end, float curve){
         this.minimum_start = minimum_start;
@@ -25,19 +26,26 @@ public class MinimumUtility {
 
         double utilityConceding = minimum_end + (1 - Math.pow(time, curve))*(minimum_start-minimum_end);
 
-        utilityConceding += (1 - Math.pow(time, 150))*(concession);
+        double utilityDistance = (1 - Math.pow(time, 120)) * (minimum_end + (1-minimum_end) * minimum_dis);
 
-        if (utilityConceding > 1) {
-            utilityConceding = 1;
-        }
-
-        if(utilityModeling > utilityConceding) {
+        if(utilityModeling > utilityConceding && utilityModeling > utilityDistance) {
             System.out.println("Modeling utility: " + utilityModeling);
             utility = utilityModeling;
-        } else {
+        } else if (utilityConceding > utilityDistance){
             System.out.println("Conceding utility: " + utilityConceding + " with concession rate:" + concession);
             utility = utilityConceding;
+        } else {
+            System.out.println("Conceding utility: " + utilityConceding + " with concession rate:" + concession);
+            utility = utilityDistance;
         }
+    }
+
+    public void goal(double goal) {
+        minimum_end = new Float(goal);
+    }
+
+    public void minDistance(double distance){
+        minimum_dis = distance;
     }
 
     public double get(){

@@ -8,7 +8,10 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by archah on 08/10/2016.
@@ -91,6 +94,26 @@ public class OpponentModelDiscrete extends OpponentModel{
         double dev = getAverage(endMean, ownUtils.size());
 
         return 1 - (mean/dev);
+    }
+
+    public double getRelativeDistance(Bid bid){
+        double bidUtil = utilSpace.getUtility(bid);
+        double max = 1;
+        int block = 3;
+
+        int start = bids.size()-block < 0 ? 0 : bids.size() -block;
+
+        List<Bid> sublist = bids.subList(start, bids.size());
+
+        double average = 0;
+
+        for(Bid b : sublist) {
+            average += utilSpace.getUtility(b);
+        }
+
+        average = average / block;
+
+        return (average - bidUtil)/(max - bidUtil);
     }
 
     private double getAverage(int start, int end){

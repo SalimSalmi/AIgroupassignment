@@ -1,6 +1,7 @@
 package ai2016;
 
 import negotiator.AgentID;
+import negotiator.Bid;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
@@ -99,6 +100,21 @@ public class OpponentList extends ArrayList<OpponentModel> {
         }
 
         return res;
+    }
+
+    public double getRelativeDistance(Bid bid) {
+        double distance = 0;
+
+        for(int j = 0; j < this.size(); j++){
+
+            OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
+
+            distance += opponent.getRelativeDistance(bid);
+        }
+
+        distance = distance / this.size();
+
+        return distance;
     }
 
     public OpponentModel getAverageOpponentModel(AbstractUtilitySpace utilSpace) {
