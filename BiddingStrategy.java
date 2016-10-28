@@ -35,7 +35,7 @@ public class BiddingStrategy {
             case MEAN_MODELING:
                 opponents.stopModeling();
             case OPPONENT_MODELING:
-                bid = getNextHardHeaded(samples);
+                bid = getNextNaiveBid(samples);
                 break;
             case CONCEDING:
                 bid = getNextConcessionBid(samples);
@@ -44,13 +44,14 @@ public class BiddingStrategy {
                 bid = getNextConcessionBid(samples);
                 break;
             default:
-                bid = getNextHardHeaded(samples);
+                bid = getNextNaiveBid(samples);
         }
 
         return bid;
     }
 
-    private Bid getNextHardHeaded(ArrayList<Bid> samples) {
+    // Get the lowest bid (closest to reservation curve).
+    private Bid getNextNaiveBid(ArrayList<Bid> samples) {
         if (samples.size() == 0) {
             return maxBid;
         }

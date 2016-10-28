@@ -18,7 +18,7 @@ public class OpponentModel {
     }
 
     public void init(AbstractUtilitySpace utilSpace){
-
+        this.utilSpace = utilSpace;
 
     }
 

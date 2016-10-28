@@ -85,22 +85,6 @@ public class OpponentList extends ArrayList<OpponentModel> {
         return alphas;
     }
 
-    public double getConcessionRate(){
-        double res = Double.MIN_VALUE;
-
-        for(int j = 0; j < this.size(); j++){
-
-            OpponentModelDiscrete opponent = (OpponentModelDiscrete) this.get(j);
-
-            double concession = opponent.getConcessionRate();
-
-            if(concession > res ) {
-                res = concession;
-            }
-        }
-
-        return res;
-    }
 
     public double getRelativeDistance(Bid bid) {
         double distance = 0;

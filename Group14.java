@@ -116,13 +116,13 @@ public class Group14 extends AbstractNegotiationParty {
 		if (lastReceivedBid == null || !validActions.contains(Accept.class)
 				|| !acceptanceStrategy.accept(lastReceivedBid, bid)) {
 
-			LOGGER.info( "Offer, " + getUtility(bid));
+//			LOGGER.info( "Offer, " + getUtility(bid));
 
 			return new Offer(getPartyId(), bid);
 
 		} else {
 
-			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
+//			LOGGER.info( "Accept, " + getUtility(lastReceivedBid));
 
 			return new Accept(getPartyId(), lastReceivedBid);
 		}
@@ -177,9 +177,9 @@ public class Group14 extends AbstractNegotiationParty {
 		float refreshDelta = (1 - MEAN_MODEL_TIME) / REFRESH_MEAN;
 
 		if(STATE == NegotiationState.CONCEDING || STATE == NegotiationState.DEADLINE) {
-			minimumUtility.set(time, opponents.getConcessionRate());
+			minimumUtility.set(time);
 		} else {
-			minimumUtility.set(time, 0);
+			minimumUtility.set(time);
 		}
 
 
@@ -205,11 +205,7 @@ public class Group14 extends AbstractNegotiationParty {
 		ArrayList<Bid> bids = new ArrayList<>();
 
 		// Always add the max utility bid
-		try {
-			bids.add(getUtilitySpace().getMaxUtilityBid());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		bids.add(maxBid);
 
 		int i = 0;
 		do {
@@ -218,9 +214,9 @@ public class Group14 extends AbstractNegotiationParty {
 				bids.add(bid);
 			}
 			i++;
-		} while (bids.size() <= sampleSize && i < 10000);
+		} while (bids.size() <= sampleSize && i < 2500);
 
-		System.out.println("It took " + i + " loops with min value: " + minimumUtility.get());
+//		System.out.println("It took " + i + " loops with min value: " + minimumUtility.get());
 
 		return bids;
 	}

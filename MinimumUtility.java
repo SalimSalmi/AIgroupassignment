@@ -17,10 +17,10 @@ public class MinimumUtility {
         this.minimum_end = minimum_end;
         this.curve = curve;
 
-        set(0, 0);
+        set(0);
     }
 
-    public void set(double time, double concession) {
+    public void set(double time) {
 
         double utilityModeling = (1 - 2*Math.pow(time, 2));
 
@@ -29,13 +29,13 @@ public class MinimumUtility {
         double utilityDistance = (1 - Math.pow(time, 120)) * (minimum_end + (1-minimum_end) * minimum_dis);
 
         if(utilityModeling > utilityConceding && utilityModeling > utilityDistance) {
-            System.out.println("Modeling utility: " + utilityModeling);
+//            System.out.println("Modeling utility: " + utilityModeling);
             utility = utilityModeling;
         } else if (utilityConceding > utilityDistance){
-            System.out.println("Conceding utility: " + utilityConceding + " with concession rate:" + concession);
+//            System.out.println("Conceding utility: " + utilityConceding );
             utility = utilityConceding;
         } else {
-            System.out.println("Conceding utility: " + utilityConceding + " with concession rate:" + concession);
+//            System.out.println("Conceding utility: " + utilityConceding );
             utility = utilityDistance;
         }
     }

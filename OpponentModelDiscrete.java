@@ -32,6 +32,7 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     @Override
     public void init(AbstractUtilitySpace utilSpace) {
+        super.init(utilSpace);
         this.utilSpace = (AdditiveUtilitySpace) utilSpace;
 
         // Reset the weights and the values for the utility space.
@@ -80,22 +81,6 @@ public class OpponentModelDiscrete extends OpponentModel{
 
     }
 
-    public double getConcessionRate(){
-
-        int startMean = ownUtils.size() - 3*BLOCK_SIZE;
-        int endMean = ownUtils.size() - BLOCK_SIZE;
-
-        if (ownUtils.size() < 3*BLOCK_SIZE) {
-            startMean = 0;
-            endMean = (int) Math.floor(2*ownUtils.size()/3);
-        }
-
-        double mean = getAverage(startMean, endMean);
-        double dev = getAverage(endMean, ownUtils.size());
-
-        return 1 - (mean/dev);
-    }
-
     public double getRelativeDistance(Bid bid){
         double bidUtil = utilSpace.getUtility(bid);
         double max = 1;
@@ -114,20 +99,6 @@ public class OpponentModelDiscrete extends OpponentModel{
         average = average / block;
 
         return (average - bidUtil)/(max - bidUtil);
-    }
-
-    private double getAverage(int start, int end){
-        double result = 0;
-        List<Double> block = new ArrayList();
-        block.addAll(ownUtils);
-        block = block.subList(start, end);
-
-        for(Double util : block){
-            result += util;
-        }
-        result = result / block.size();
-
-        return result;
     }
 
 
@@ -211,11 +182,8 @@ public class OpponentModelDiscrete extends OpponentModel{
     public double getDropRate(){
 
         double average = 0;
-
         int interval = 10;///Set it later
-
         int count = 0;
-
         double avg_final = 0;
 
         for(int i = 1; i < (bids.size()-interval); i++) {
