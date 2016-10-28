@@ -14,7 +14,7 @@ public class AcceptanceStrategy {
     private Bid previousAccepted;
 
     /**
-     * Judges if a bid should be accepted or not.
+     * Create an acceptance strategy which judges bids to accept
      *
      * @param utilSpace The utility space of the agent
      * @param minimumUtility The minimum utility curve
