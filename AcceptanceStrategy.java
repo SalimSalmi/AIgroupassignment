@@ -25,7 +25,7 @@ public class AcceptanceStrategy {
 
         if(state == NegotiationState.DEADLINE) {
             // Lower the ratio to allow for more acceptable bids.
-            deadlineRatio = 0.5f;
+            deadlineRatio = 0.75f;
         }
 
         boolean accept;
