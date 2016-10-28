@@ -30,7 +30,7 @@ public class Group14 extends AbstractNegotiationParty {
 	private final float OPPONENT_MODEL_TIME = 0.2f; // Deadline to fix the opponent model
 	private final float MEAN_MODEL_TIME = 0.35f; // Deadline to start calculating the mean model
 	private final float CONCEDE_TIME = 0.99f; // Deadline until hard concede
-	private final int REFRESH_MEAN = 20; // Amount of times the mean model is being refreshed
+	private final int REFRESH_MEAN = 50; // Amount of times the mean model is being refreshed
 	private float nextRefresh = MEAN_MODEL_TIME; // Next time the mean model needs to be calculated.
 
 	private final int RANDOM_SAMPLE = 30; // Amount of random samples we try to get above the min utility

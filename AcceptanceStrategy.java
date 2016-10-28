@@ -13,7 +13,6 @@ public class AcceptanceStrategy {
 
     private Bid previousAccepted;
 
-
     public AcceptanceStrategy(AbstractUtilitySpace utilSpace, MinimumUtility minimumUtility) {
         this.utilSpace = utilSpace;
         this.minimumUtility = minimumUtility;
@@ -21,10 +20,12 @@ public class AcceptanceStrategy {
 
     public boolean accept(Bid bid, Bid nextBid, NegotiationState state){
 
+        // Set a ratio to the minimum utility we will accept.
         float deadlineRatio = 1;
 
         if(state == NegotiationState.DEADLINE) {
-            deadlineRatio = 0.75f;
+            // Lower the ratio to allow for more acceptable bids.
+            deadlineRatio = 0.5f;
         }
 
         boolean accept;
@@ -47,7 +48,6 @@ public class AcceptanceStrategy {
         }
 
         return accept;
-
 
     }
 }
