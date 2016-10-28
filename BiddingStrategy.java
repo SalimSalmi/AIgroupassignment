@@ -43,7 +43,7 @@ public class BiddingStrategy {
      * @param STATE The state the negotiation is in.
      * @param samples List of bid samples above the minimum utility.
      *
-     * @return True if the bid is accepted, false otherwise.
+     * @return The next bid to give.
      */
     public Bid getNextBid(NegotiationState STATE, ArrayList<Bid> samples) {
         Bid bid;
