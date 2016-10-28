@@ -17,6 +17,13 @@ import java.util.Map;
 public class OpponentList extends ArrayList<OpponentModel> {
 
 
+    /**
+     * Returns a requested opponent.
+     *
+     * @param sender The opponent's agent ID
+     * @param utilSpace The utility space to initiate opponent if it doesn't exist already
+     * @return The requested opponent
+     */
     public OpponentModel getOpponent(AgentID sender, AbstractUtilitySpace utilSpace) {
 
         OpponentModel opponent;
@@ -37,6 +44,9 @@ public class OpponentList extends ArrayList<OpponentModel> {
 
     }
 
+    /**
+     * Stops all opponents from being modeled.
+     */
     public void stopModeling(){
         for(int j = 0; j < this.size(); j++) {
             OpponentModel opponent = this.get(j);
@@ -45,6 +55,13 @@ public class OpponentList extends ArrayList<OpponentModel> {
     }
 
 
+    /**
+     * Returns a the average relative distance from a given bid.
+     *
+     * @param bid The bid to which to calculate the distance.
+     *
+     * @return The relative distance from the bid.
+     */
     public double getRelativeDistance(Bid bid) {
         double distance = 0;
 
@@ -77,6 +94,14 @@ public class OpponentList extends ArrayList<OpponentModel> {
         return alphas;
     }
 
+
+    /**
+     * Calculates the average opponent.
+     *
+     * @param utilSpace The utility space to initiate the average opponent
+     *
+     * @return The average opponent model.
+     */
     public OpponentModel getAverageOpponentModel(AbstractUtilitySpace utilSpace) {
 
         OpponentModelDiscrete opponentAvg = new OpponentModelDiscrete(null);
