@@ -33,8 +33,8 @@ public class Group14 extends AbstractNegotiationParty {
 	private final int REFRESH_MEAN = 20; // Amount of times the mean model is being refreshed
 	private float nextRefresh = MEAN_MODEL_TIME; // Next time the mean model needs to be calculated.
 
-	private final int BLOCK_SIZE = 5; // Size of bids to consider when calculating the concession.
-	private final int RANDOM_SAMPLE = 30;
+	private final int RANDOM_SAMPLE = 30; // Amount of random samples we try to get above the min utility
+	private final int SAMPLE_BOUND = 2500; // Amount of runs we maximally do to get the random samples.
 
 	private final float MINIMUM_UTILITY_START = 0.9f;
 	private final float MINIMUM_UTILITY_END = 0.0f;
@@ -46,7 +46,7 @@ public class Group14 extends AbstractNegotiationParty {
 	private Bid lastReceivedBid = null;
 	private Bid maxBid;
 
-	private OpponentList opponents = new OpponentList(BLOCK_SIZE); // List of opponent models
+	private OpponentList opponents = new OpponentList(); // List of opponent models
 	private AcceptanceStrategy acceptanceStrategy; // Functions for the acceptance strategy
 	private BiddingStrategy biddingStrategy; // Decides which bid to get next.
 	private MinimumUtility minimumUtility; // The function for deciding the minimum required utility based on the time.
@@ -155,12 +155,12 @@ public class Group14 extends AbstractNegotiationParty {
 
 			if (action instanceof Offer) {
 				Bid bid = ((Offer) action).getBid();
-				opponent.pushBid(bid,getUtility(bid));
+				opponent.pushBid(bid);
 			}
 
 			if (action instanceof Accept) {
 				Bid bid = ((Accept) action).getBid();
-				opponent.pushBid(bid,getUtility(bid));
+				opponent.pushBid(bid);
 			}
 		}
 
@@ -214,7 +214,7 @@ public class Group14 extends AbstractNegotiationParty {
 				bids.add(bid);
 			}
 			i++;
-		} while (bids.size() <= sampleSize && i < 2500);
+		} while (bids.size() <= sampleSize && i < SAMPLE_BOUND);
 
 //		System.out.println("It took " + i + " loops with min value: " + minimumUtility.get());
 
