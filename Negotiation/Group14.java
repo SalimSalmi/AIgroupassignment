@@ -186,7 +186,7 @@ public class Group14 extends AbstractNegotiationParty {
 			}
 			i++;
 		} while (bids.size() <= sampleSize && i < SAMPLE_BOUND);
-		
+
 		return bids;
 	}
 }
